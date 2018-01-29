@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+	<definition name="standard" template="/WEB-INF/views/layout/layout.jsp">
+		<put-attribute name="menu" value="/WEB-INF/views/layout/menu.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp" />
+	</definition>
+
+	<definition name="common.index" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/common/index.jsp" />
+	</definition>
+	
+	<definition name="admin.index" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/common/admin/adminPage.jsp" />
+	</definition>
+	
+	<!-- EXCEPTION PAGES  --> 
+	
+	<definition name="error.accessDenied" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/exception/accessDenied.jsp"/>	
+	</definition>
+	
+	<definition name="error" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/exception/error.jsp"/>	
+	</definition>
+	
+	<definition name="businessError" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/exception/businessError.jsp"/>	
+	</definition>
+	
+	<definition name="notFound" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/exception/notFound.jsp"/>	
+	</definition>
+	
+	<definition name="clientError" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/exception/clientError.jsp"/>	
+	</definition>
+	
+	<definition name="serverError" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/exception/serverError.jsp"/>	
+	</definition>
+
+</tiles-definitions>

@@ -1,0 +1,11 @@
+<Context path="/OptaPlannerTest">
+
+    <Resource name="jdbc/univaqdb2017" scope="Unshareable" type="javax.sql.DataSource"
+              maxActive="100" maxIdle="30" maxWait="5000"
+              username="univaqUser" password="univaqUser" driverClassName="com.mysql.jdbc.Driver"
+              url="jdbc:mysql://127.0.0.1:3306/univaqdb2017"/>
+              
+              <!-- Oracle example -->
+              <!-- url="jdbc:oracle:thin:@127.0.0.1:1521:XE" -->
+         
+</Context>
