@@ -1,5 +1,3 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="security"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
@@ -14,7 +12,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="">
-	<meta name="author" content="">
+	<meta name="author" content="Davide De Innocentis">
 	
 	<title>
 		<spring:message code=".common.title" />
@@ -65,7 +63,6 @@
 <body>
 	<div class="container container-fluid">
 		<tiles:insertAttribute name="menu" />
-		<hr>
 		
 		<div>
 			<tiles:insertAttribute name="body" />

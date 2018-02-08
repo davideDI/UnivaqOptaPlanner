@@ -25,6 +25,40 @@ import java.util.List;
 	#whenChanged: 20171018220500
 	mail: davide.de.innocentis
 */
+
+/*
+ *  	idPrimary 	int(10) 		UNSIGNED 	No 	None 	user id 	AUTO_INCREMENT 	Change Change 	Drop Drop 	
+
+    Primary Primary
+    More
+
+	2 	cn 	varchar(255) 	utf8_unicode_ci 		No 	None 	common name 		Change Change 	Drop Drop 	
+
+    Primary Primary
+    More
+
+	3 	name 	varchar(255) 	utf8_unicode_ci 		Yes 	NULL 	user name 		Change Change 	Drop Drop 	
+
+    Primary Primary
+    More
+
+	4 	surname 	varchar(255) 	utf8_unicode_ci 		Yes 	NULL 	user surname 		Change Change 	Drop Drop 	
+
+    Primary Primary
+    More
+
+	5 	emailIndex 	varchar(255) 	utf8_unicode_ci 		Yes 	NULL 	user email 		Change Change 	Drop Drop 	
+
+    Primary Primary
+    More
+
+	6 	registration_number 	varchar(255) 	utf8_unicode_ci 		No 	None 	user registration number 		Change Change 	Drop Drop 	
+
+    Primary Primary
+    More
+
+	7 	tip_user_idIndex 	int(10) 
+ */
 public class User implements Serializable {
 
 	private static final long serialVersionUID = -758181024979837797L;

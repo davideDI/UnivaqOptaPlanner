@@ -13,10 +13,11 @@
 		<security:access-denied-handler error-page="/WEB-INF/views/exception/accessDenied.jsp" />
 		<security:intercept-url pattern="/resources/**" access="permitAll" />
 		
-		<security:intercept-url pattern="/admin/**" access="hasAnyRole('secretary')"/>
+		<security:intercept-url pattern="/admin/**" access="hasAnyRole('admin ateneo, admin dipartimento')"/>
+		<security:intercept-url pattern="/group/**" access="hasAnyRole('admin ateneo, admin dipartimento')"/>
 		
 		<security:form-login login-page="/index" 
-							 default-target-url="/"
+							 default-target-url="/login.do"
 							 always-use-default-target="false"/>
 
 	</security:http>

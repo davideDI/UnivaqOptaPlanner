@@ -32,13 +32,31 @@
 		</div>
 	</security:authorize>
 	
-	<security:authorize access="hasAnyRole('teacher')">
-		teacher
+	<security:authorize access="isAuthenticated()">
+		<security:authorize access="hasAnyRole('admin dipartimento')">
+			<div class="row">
+		        <div class="col-xs-12 col-sm-12 col-md-12">
+		            <p class="text-center"><b><spring:message code=".index.authorized" /></b></p>
+		        </div>
+		    </div>
+			<div class="row">
+				<c:forEach items="${sessionScope.groupList}"  var="group">
+					<div class="col-xs-4 col-sm-4 col-md-4">
+		                <a href="${pageContext.request.contextPath}/group/${group.id}">
+		                    <p class="text-center"><b><c:out value="${group.name}" /></b></p>
+		                </a>
+		                <p class="text-center"><c:out value="${group.description}" /></p>
+		            </div>  
+				</c:forEach>
+		    </div>
+		</security:authorize>
+		<security:authorize access="!hasAnyRole('admin dipartimento')">
+			<div class="row">
+		        <div class="col-xs-12 col-sm-12 col-md-12">
+		            <p class="text-center"><b><spring:message code=".index.not.authorized" /></b></p>
+		        </div>
+		    </div>
+		</security:authorize>
 	</security:authorize>
-	<security:authorize access="hasAnyRole('secretary')">
-		secretary
-	</security:authorize>
-	<security:authorize access="hasAnyRole('admin dipartimento')">
-		admin dipartimento
-	</security:authorize>
+	
 </section>

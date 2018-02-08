@@ -13,8 +13,8 @@
 		<put-attribute name="body" value="/WEB-INF/views/common/index.jsp" />
 	</definition>
 	
-	<definition name="admin.index" extends="standard">
-		<put-attribute name="body" value="/WEB-INF/views/common/admin/adminPage.jsp" />
+	<definition name="common.calendar.resource" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/common/calendarOfResource.jsp" />
 	</definition>
 	
 	<!-- EXCEPTION PAGES  --> 

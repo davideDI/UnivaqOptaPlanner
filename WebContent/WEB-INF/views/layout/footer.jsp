@@ -23,3 +23,16 @@
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/jquery.cslider.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/custom.js"></script>
+
+<!-- Select2 -->
+<link href="${pageContext.request.contextPath}/resources/select2-4.0.3/dist/css/select2.min.css" rel="stylesheet" />
+<script src="${pageContext.request.contextPath}/resources/select2-4.0.3/dist/js/select2.min.js"></script>
+
+<!-- Full Calendar Javascript -->
+<link rel='stylesheet' href="${pageContext.request.contextPath}/resources/fullcalendar-3.1.0/fullcalendar.min.css" />
+<link rel='stylesheet' href="${pageContext.request.contextPath}/resources/fullcalendar-3.1.0/fullcalendar.print.min.css" media='print' />
+<!-- Libreria già presente (in caso di non compatibilità di versioni valutare caricamento unica libreria) </script>-->
+<!-- <script src='lib/jquery.min.js'></script> -->
+<script src="${pageContext.request.contextPath}/resources/fullcalendar-3.1.0/lib/moment.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/fullcalendar-3.1.0/fullcalendar.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/fullcalendar-3.1.0/locale-all.js"></script>

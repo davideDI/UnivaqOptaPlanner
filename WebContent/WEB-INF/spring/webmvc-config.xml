@@ -55,5 +55,7 @@
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 
 	<context:component-scan base-package="it.univaq.planner.presentation" />
+	
+	<context:property-placeholder location="classpath:settings.properties"/>
 
 </beans>
