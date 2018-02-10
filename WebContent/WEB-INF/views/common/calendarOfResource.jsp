@@ -26,7 +26,7 @@
              <div class="col-md-12">
              	<form name="optimizationFomr" method="POST" role="form" action="${pageContext.request.contextPath}/admin/optimization.do">
              		<button name="optimizationSubmit" value="${firstResource.id}" >
-             			ottimizza
+             			<spring:message code=".calendar.optimize" />
              		</button>
              	</form>
              </div>

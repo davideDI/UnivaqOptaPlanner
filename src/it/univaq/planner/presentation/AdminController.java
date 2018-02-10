@@ -51,6 +51,24 @@ public class AdminController extends ABaseController {
 	        solver.solve(courseSchedule);
 	        CourseSchedule bestSolution = (CourseSchedule) solver.getBestSolution();
 			
+	        /*
+			List<Resource> resourceList = resourceService.getResourcesByIdGroup(new Long(idGroup));
+			mav.addObject(RESOURCE_LIST, resourceList);
+			
+			if(resourceList != null && !resourceList.isEmpty()) {
+				Resource selectedResource = resourceList.get(0);
+				mav.addObject(FIRST_RESOURCE, selectedResource);
+				mav.addObject(BOOKING_LIST, bookingService.getAllBookingsByIdResource(selectedResource.getId()));
+			}
+	         */
+	        Resource resource = resourceService.getResourceById(resourceIdL);
+	        List<Resource> resourceList = resourceService.getResourcesByIdGroup(resource.getGroup().getId());
+	        mav.addObject(RESOURCE_LIST, resourceList);
+			mav.addObject(SELECTED_GROUP, resource.getGroup());
+			mav.addObject(FIRST_RESOURCE, resource);
+			mav.addObject(BOOKING_LIST, getBookingsFromCourseSchedule(bestSolution));
+			
+	        
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -59,6 +77,12 @@ public class AdminController extends ABaseController {
 		
 	}
 	
+	private Object getBookingsFromCourseSchedule(CourseSchedule bestSolution) {
+		
+		return null;
+		
+	}
+
 	private CourseSchedule getCourseSchedule(Long resourceId) throws Exception {
 		
 		CourseSchedule courseScheduleInput = new CourseSchedule();
