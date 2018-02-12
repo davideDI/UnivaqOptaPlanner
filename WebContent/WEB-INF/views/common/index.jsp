@@ -3,6 +3,9 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ page import="it.univaq.planner.common.spring.PlannerConstants" %>
+
+<c:set var="viewBookingDo" value="<%= PlannerConstants.URL_VIEW_BOOKING_DO %>" />
 
 <section class="container">
 	
@@ -42,9 +45,11 @@
 			<div class="row">
 				<c:forEach items="${sessionScope.groupList}"  var="group">
 					<div class="col-xs-4 col-sm-4 col-md-4">
-		                <a href="${pageContext.request.contextPath}/group/${group.id}">
-		                    <p class="text-center"><b><c:out value="${group.name}" /></b></p>
-		                </a>
+						<form name="optimizationFomr" align="center" method="POST" role="form" action="${pageContext.request.contextPath}${viewBookingDo}">
+		             		<button class="buttonToLink" name="groupId" value="${group.id}" >
+		             			<b><c:out value="${group.name}" /></b>
+		             		</button>
+		             	</form>
 		                <p class="text-center"><c:out value="${group.description}" /></p>
 		            </div>  
 				</c:forEach>

@@ -819,3 +819,14 @@ font-size:13px;
 	font-weight: 400;
 }
 }
+
+.buttonToLink {
+	
+	background:none!important;
+    color:inherit;
+    border:none; 
+    padding:0!important;
+    font: inherit;
+    cursor: pointer;
+	
+}

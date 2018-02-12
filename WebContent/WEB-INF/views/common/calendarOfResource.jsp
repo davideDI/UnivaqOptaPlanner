@@ -1,5 +1,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ page import="it.univaq.planner.common.spring.PlannerConstants" %>
+
+<c:set var="viewBookingDo" value="<%= PlannerConstants.URL_VIEW_BOOKING_DO %>" />
 
 <div class="row">
 	
@@ -9,12 +12,12 @@
 
                  <legend><c:out value="${selectedGroup.name}" /></legend>
                  <select id="resourceSelect"
-                         onChange="window.location.href=this.value"
+                         onChange="submitFormBookingDo(this.value)"
                          class="listOfResources"
                          style="width: 90%">
                      <option></option>
                      <c:forEach items="${resourceList}" var="resource">
-                     	<option value="${pageContext.request.contextPath}/bookings/${resource.id}">
+                     	<option value="${resource.id}">
                              <c:out value="${resource.name}" /> (<c:out value="${resource.capacity}" /> <spring:message code=".calendar.seats" />)
                          </option>
                      </c:forEach>
@@ -22,10 +25,11 @@
 
              </div>
         </div>
+        <br>
         <div class="row">
              <div class="col-md-12">
              	<form name="optimizationFomr" method="POST" role="form" action="${pageContext.request.contextPath}/admin/optimization.do">
-             		<button name="optimizationSubmit" value="${firstResource.id}" >
+             		<button class="btn" name="optimizationSubmit" value="${firstResource.id}" >
              			<spring:message code=".calendar.optimize" />
              		</button>
              	</form>
@@ -45,6 +49,12 @@
 </div>
 
 <script type="text/javascript">
+
+	function submitFormBookingDo(id) {
+		$('<form method="POST" action="${pageContext.request.contextPath}${viewBookingDo}"><input type="hidden" name="resourceId" value="'+id+'" /></form>').appendTo('body').submit().remove();
+		
+	}
+
     $(document).ready(function() {
     	
       $(".listOfResources").select2({

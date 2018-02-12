@@ -6,6 +6,14 @@ public interface PlannerConstants {
 	public final static String URL_LOGIN_DO = "/login.do";
 	public final static String URL_GROUP_ID = "/group/{idGroup}";
 	public final static String URL_BOOKING_ID_RESOURCE = "/bookings/{idResource}";
+	public final static String URL_VIEW_BOOKING_DO = "/viewBooking.do";
+	
+	//Redirect
+	public final static String REDIRECT_HOME = "redirect:/";
+	
+	//Parameter
+	public final static String PARAMETER_RESOURCE_ID = "resourceId";
+	public final static String PARAMETER_GROUP_ID = "groupId";
 	
 	//View name
 	public final static String VIEW_COMMON_INDEX = "common.index";
