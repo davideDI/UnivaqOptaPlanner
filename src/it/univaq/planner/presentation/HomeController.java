@@ -2,7 +2,9 @@ package it.univaq.planner.presentation;
 
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -19,7 +21,7 @@ import it.univaq.planner.business.model.Resource;
 public class HomeController extends ABaseController {
 
 	@RequestMapping(value=URL_LOGIN_DO, method=RequestMethod.GET)
-	public ModelAndView getHomePage(HttpServletRequest request) {
+	public ModelAndView getHomePage(HttpServletRequest request, HttpServletResponse response) {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName(VIEW_COMMON_INDEX);
@@ -27,6 +29,7 @@ public class HomeController extends ABaseController {
 		try {
 		
 			request.getSession().setAttribute(GROUP_LIST, groupService.getAllGroups());
+			response.addCookie(new Cookie(LOCALIZATION_COOKIE, DEFAULT_VALUE_COOKIE));
 		
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -38,7 +41,7 @@ public class HomeController extends ABaseController {
 	
 	@RequestMapping(value=URL_GROUP_ID, method=RequestMethod.GET)
 	public ModelAndView getResourceByGroup( @PathVariable(ID_GROUP) String idGroup, 
-											@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
+											@CookieValue(value = LOCALIZATION_COOKIE) String localizationCookie) {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName(VIEW_COMMON_CALENDAR_RESOURCE);

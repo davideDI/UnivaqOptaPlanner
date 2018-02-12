@@ -14,6 +14,7 @@ public interface PlannerConstants {
 	//View Object
 	public final static String GROUP_LIST = "groupList";
 	public final static String LOCALIZATION_COOKIE = "localizationCookie";
+	public final static String DEFAULT_VALUE_COOKIE = "it";
 	public final static String SELECTED_GROUP = "selectedGroup";
 	public final static String FIRST_RESOURCE = "firstResource";
 	public final static String RESOURCE_LIST = "resourceList";
