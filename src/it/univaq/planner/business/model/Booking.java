@@ -13,7 +13,7 @@ public class Booking implements Serializable {
 	}
 
 	public Booking(Long id, String name, String description, Date bookingDate, Integer numStudents, String subjectID,
-			String teacherID, Short idTipEvent, Long idUser, List<Repeat> repeatList, Resource resource) {
+			String teacherID, String cdsID, Short idTipEvent, Long idUser, List<Repeat> repeatList, Resource resource) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -22,6 +22,7 @@ public class Booking implements Serializable {
 		this.numStudents = numStudents;
 		this.subjectID = subjectID;
 		this.teacherID = teacherID;
+		this.cdsID = cdsID;
 		this.idTipEvent = idTipEvent;
 		this.idUser = idUser;
 		this.repeatList = repeatList;
@@ -35,6 +36,7 @@ public class Booking implements Serializable {
 	private Integer numStudents;
 	private String subjectID;
 	private String teacherID;
+	private String cdsID;
 	private Short idTipEvent;
 	private Long idUser;
 	private List<Repeat> repeatList;
@@ -82,6 +84,12 @@ public class Booking implements Serializable {
 	public void setTeacherID(String teacherID) {
 		this.teacherID = teacherID;
 	}
+	public String getCdsID() {
+		return cdsID;
+	}
+	public void setCdsID(String cdsID) {
+		this.cdsID = cdsID;
+	}
 	public Short getIdTipEvent() {
 		return idTipEvent;
 	}
@@ -106,13 +114,13 @@ public class Booking implements Serializable {
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Booking [id=" + id + ", name=" + name + ", description=" + description + ", bookingDate=" + bookingDate
-				+ ", numStudents=" + numStudents + ", subjectID=" + subjectID + ", teacherID=" + teacherID
-				+ ", idTipEvent=" + idTipEvent + ", idUser=" + idUser + ", repeatList=" + repeatList + ", resource="
-				+ resource + "]";
+				+ ", numStudents=" + numStudents + ", subjectID=" + subjectID + ", teacherID=" + teacherID + ", cdsID="
+				+ cdsID + ", idTipEvent=" + idTipEvent + ", idUser=" + idUser + ", repeatList=" + repeatList
+				+ ", resource=" + resource + "]";
 	}
 	
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import it.univaq.planner.business.model.Booking;
 import it.univaq.planner.business.model.Group;
 import it.univaq.planner.business.model.Resource;
 
@@ -54,7 +55,9 @@ public class HomeController extends ABaseController {
 			if(resourceList != null && !resourceList.isEmpty()) {
 				Resource selectedResource = resourceList.get(0);
 				mav.addObject(FIRST_RESOURCE, selectedResource);
-				mav.addObject(BOOKING_LIST, bookingService.getAllBookingsByIdResource(selectedResource.getId()));
+				List<Booking> bookingList = bookingService.getAllBookingsByIdResource(selectedResource.getId());
+				System.out.println(bookingList);
+				mav.addObject(BOOKING_LIST, bookingList);
 			}
 			
 		} catch(Exception ex) {

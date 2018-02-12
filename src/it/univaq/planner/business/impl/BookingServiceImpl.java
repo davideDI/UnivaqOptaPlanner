@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +53,7 @@ public class BookingServiceImpl implements BookingService {
 				bookingTemp.setNumStudents((Integer) rs.getInt("num_students"));
 				bookingTemp.setSubjectID((String) rs.getString("subject_id"));
 				bookingTemp.setTeacherID((String) rs.getString("teacher_id"));
+				bookingTemp.setCdsID((String) rs.getString("cds_id"));
 				bookingTemp.setBookingDate((Date) rs.getDate("booking_date"));
 				bookingTemp.setResource(resourceService.getResourceById((Long) rs.getLong("resource_id")));
 				bookingTemp.setIdTipEvent((Short) rs.getShort("tip_event_id"));
@@ -145,6 +147,7 @@ public class BookingServiceImpl implements BookingService {
 				bookingTemp.setNumStudents((Integer) rs.getInt("num_students"));
 				bookingTemp.setSubjectID((String) rs.getString("subject_id"));
 				bookingTemp.setTeacherID((String) rs.getString("teacher_id"));
+				bookingTemp.setCdsID((String) rs.getString("cds_id"));
 				bookingTemp.setBookingDate((Date) rs.getDate("booking_date"));
 				bookingTemp.setResource(resourceService.getResourceById((Long) rs.getLong("resource_id")));
 				bookingTemp.setIdTipEvent((Short) rs.getShort("tip_event_id"));
@@ -213,6 +216,70 @@ public class BookingServiceImpl implements BookingService {
 		}
 		
 		return teacherList;
+		
+	}
+
+	/**
+	 * Return the list of the current week
+	 */
+	@Override
+	public List<Booking> getAllBookingsByIdGroup(Long idGroup) throws Exception {
+		
+		List<Booking> bookingList = new ArrayList<Booking>();
+		
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+		Date firstDayOfWeek = cal.getTime();
+		
+		cal.add(Calendar.DATE, 7);
+		Date lastDayOfWeek = cal.getTime();
+		
+		Connection con = null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			st = con.prepareStatement("select b.* from bookings b, groups g, resources r where b.resource_id = r.id and r.group_id = g.id and g.id = ?");
+			st.setLong(1, idGroup);
+			rs = st.executeQuery();
+			while (rs.next()) {
+				Booking bookingTemp = new Booking();
+				
+				bookingTemp.setId((Long) rs.getLong("id"));
+				bookingTemp.setName((String) rs.getString("name"));
+				bookingTemp.setDescription((String) rs.getString("description"));
+				bookingTemp.setNumStudents((Integer) rs.getInt("num_students"));
+				bookingTemp.setSubjectID((String) rs.getString("subject_id"));
+				bookingTemp.setTeacherID((String) rs.getString("teacher_id"));
+				bookingTemp.setCdsID((String) rs.getString("cds_id"));
+				bookingTemp.setBookingDate((Date) rs.getDate("booking_date"));
+				bookingTemp.setResource(resourceService.getResourceById((Long) rs.getLong("resource_id")));
+				bookingTemp.setIdTipEvent((Short) rs.getShort("tip_event_id"));
+				bookingTemp.setIdUser((Long) rs.getLong("user_id"));
+				bookingTemp.setRepeatList(repeatService.getRepeatsByIdBooking(bookingTemp.getId()));
+				
+				bookingList.add(bookingTemp);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (st != null) {
+				try {
+					st.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+				}
+			}
+
+		}
+		
+		return bookingList;
 		
 	}
 

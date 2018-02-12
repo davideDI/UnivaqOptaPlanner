@@ -79,8 +79,8 @@
 	        	  			id         	: '${booking.id}',
 	                        title      	: '${booking.name}',
 	                        description	: '${booking.description}',
-	                        start      	: '${repeat.eventDateStart}',
-	                        end        	: '${repeat.eventDateEnd}',
+	                        start      	: moment('${repeat.eventDateStart}').format("YYYY-MM-DD HH:mm:ss"),
+	                        end        	: moment('${repeat.eventDateEnd}').format("YYYY-MM-DD HH:mm:ss"),
 	                        color 		: '#0000FF'
         	  			},
                  	</c:forEach>
