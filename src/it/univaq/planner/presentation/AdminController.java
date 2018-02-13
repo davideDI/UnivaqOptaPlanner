@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.config.SolverConfigContext;
+import org.optaplanner.core.config.solver.SolverConfig;
 import org.optaplanner.examples.curriculumcourse.domain.Course;
 import org.optaplanner.examples.curriculumcourse.domain.CourseSchedule;
 import org.optaplanner.examples.curriculumcourse.domain.Curriculum;
@@ -33,12 +35,13 @@ import it.univaq.planner.business.model.Group;
 import it.univaq.planner.business.model.Repeat;
 import it.univaq.planner.business.model.Resource;
 import it.univaq.planner.business.model.TipBookingStatus;
+import it.univaq.planner.common.spring.PlannerConstants;
 
 @Controller
-@RequestMapping(value="/admin")
+@RequestMapping(value=PlannerConstants.URL_ADMIN)
 public class AdminController extends ABaseController {
 
-	@RequestMapping(value="/optimization.do", method=RequestMethod.POST)
+	@RequestMapping(value=URL_OPTIMIZATION_DO, method=RequestMethod.POST)
 	public ModelAndView optimizationBookings(	HttpServletRequest request, 
 												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
 		
@@ -56,8 +59,12 @@ public class AdminController extends ABaseController {
 			
 			CourseSchedule courseSchedule = getCourseSchedule(resourceIdL);
 			System.out.println(courseSchedule);
-			SolverFactory solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/curriculumcourse/solver/curriculumCourseSolverConfig.xml");
-	        Solver solver = solverFactory.buildSolver();
+			SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/curriculumcourse/solver/curriculumCourseSolverConfig.xml");
+	        SolverConfig solverConfig = solverFactory.getSolverConfig();
+	        solverConfig.getTerminationConfig().setMinutesSpentLimit(0L);
+	        solverConfig.getTerminationConfig().setSecondsSpentLimit(60L);
+	        SolverConfigContext solverContext = new SolverConfigContext();
+			Solver<CourseSchedule> solver = solverConfig.buildSolver(solverContext);
 	        solver.solve(courseSchedule);
 	        CourseSchedule bestSolution = (CourseSchedule) solver.getBestSolution();
 			System.out.println(bestSolution);
@@ -67,24 +74,23 @@ public class AdminController extends ABaseController {
 			mav.addObject(SELECTED_GROUP, resource.getGroup());
 			mav.addObject(FIRST_RESOURCE, resource);
 			List<Booking> bookingListFromBestSolution = getBookingsFromCourseSchedule(bestSolution);
-			mav.addObject(BOOKING_LIST, getBookingByResource(bookingListFromBestSolution, resource));
-			
+			List<Booking> bookingListByResource = getBookingByResource(bookingListFromBestSolution, resource);
+			mav.addObject(BOOKING_LIST, bookingListByResource);
+			System.out.println(bookingListByResource);
 	        
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		Calendar fine = Calendar.getInstance();
-		System.out.println("Inizio:" + inizio);
-		System.out.println("Fine:" + fine);
+		System.out.println("Inizio:" + inizio.getTime());
+		System.out.println("Fine:" + fine.getTime());
 		return mav;
 		
 	}
 	
-	
 	//////////////////////////
 	// FROM COURSE SCHEDULE TO BOOKING
 	//////////////////////////
-	
 	private List<Booking> getBookingByResource(List<Booking> bookingListFromBestSolution, Resource resource) {
 		
 		List<Booking> filteredList = new ArrayList<Booking>();
@@ -141,15 +147,19 @@ public class AdminController extends ABaseController {
 			
 			//Course -> Booking
 			//Lecture -> Repeat
-			List<Course> courseList = bestSolution.getCourseList();
+//			List<Course> courseList = bestSolution.getCourseList();
 			List<Lecture> lectureList = bestSolution.getLectureList();
 			if(lectureList != null) {
 				for (Lecture lectureTemp : bestSolution.getLectureList()) {
 					Booking booking = new Booking();
 					booking.setId(lectureTemp.getCourse().getId());
 					booking.setSubjectID(lectureTemp.getCourse().getCode());
+					System.out.println(booking.getSubjectID());
 					booking.setTeacherID(lectureTemp.getCourse().getTeacher().getCode());
+					System.out.println(booking.getTeacherID());
 					booking.setCdsID(lectureTemp.getCourse().getCurriculumList().get(0).getCode());
+					System.out.println(booking.getCdsID());
+					booking.setName(booking.getSubjectID() + booking.getTeacherID() + booking.getCdsID());
 					Repeat repeat = new Repeat();
 					repeat.setIdBooking(lectureTemp.getCourse().getId());
 					repeat.setId(lectureTemp.getId());
@@ -164,31 +174,32 @@ public class AdminController extends ABaseController {
 				}
 			}
 			
+			System.out.println(bookingList);
 			
-			if(courseList != null && !courseList.isEmpty()) {
-				for (Course course : courseList) {
-					Booking booking = new Booking();
-					booking.setId(course.getId());
-					booking.setSubjectID(course.getCode());
-					booking.setTeacherID(course.getTeacher().getCode());
-					booking.setCdsID(course.getCurriculumList().get(0).getCode());
-					if(bestSolution.getLectureList() != null && !bestSolution.getLectureList().isEmpty()) {
-						for (Lecture lectureTemp : bestSolution.getLectureList()) {
-							Repeat repeat = new Repeat();
-							repeat.setIdBooking(course.getId());
-							repeat.setId(lectureTemp.getId());
-							repeat.setIdTipBookingStatus(TipBookingStatus.InLavorazione.getId());
-							setRepeatDate(lectureTemp, repeat);
-							List<Repeat> repeatList = new ArrayList<Repeat>();
-							repeatList.add(repeat);
-							booking.setRepeatList(repeatList);
-							if(booking.getResource() == null)
-								booking.setResource(resourceService.getResourceById(lectureTemp.getRoom().getId()));
-						}
-					}
-					bookingList.add(booking);
-				}
-			}
+//			if(courseList != null && !courseList.isEmpty()) {
+//				for (Course course : courseList) {
+//					Booking booking = new Booking();
+//					booking.setId(course.getId());
+//					booking.setSubjectID(course.getCode());
+//					booking.setTeacherID(course.getTeacher().getCode());
+//					booking.setCdsID(course.getCurriculumList().get(0).getCode());
+//					if(bestSolution.getLectureList() != null && !bestSolution.getLectureList().isEmpty()) {
+//						for (Lecture lectureTemp : bestSolution.getLectureList()) {
+//							Repeat repeat = new Repeat();
+//							repeat.setIdBooking(course.getId());
+//							repeat.setId(lectureTemp.getId());
+//							repeat.setIdTipBookingStatus(TipBookingStatus.InLavorazione.getId());
+//							setRepeatDate(lectureTemp, repeat);
+//							List<Repeat> repeatList = new ArrayList<Repeat>();
+//							repeatList.add(repeat);
+//							booking.setRepeatList(repeatList);
+//							if(booking.getResource() == null)
+//								booking.setResource(resourceService.getResourceById(lectureTemp.getRoom().getId()));
+//						}
+//					}
+//					bookingList.add(booking);
+//				}
+//			}
 			
 		}
 		
@@ -197,7 +208,7 @@ public class AdminController extends ABaseController {
 		
 	}
 	
-	private static final String[] TIMES = {"09:00", "11:00", "14:00", "16:00", "18:00", "20:00"};
+	private static final String[] TIMES = {"09:00", "11:00", "14:00", "16:00", "18:00"};
 	
 	private void setRepeatDate(Lecture lectureTemp, Repeat repeat) {
 		
@@ -301,7 +312,7 @@ public class AdminController extends ABaseController {
 		courseScheduleInput.setTeacherList(getTeacherList(bookingList));
 		
 		//TimesLotList
-		courseScheduleInput.setTimeslotList(getTimesList(7));
+		courseScheduleInput.setTimeslotList(getTimesList(5));
 
 		//DayList
 		List<Day> dayList = getDayList(5);
@@ -516,7 +527,6 @@ public class AdminController extends ABaseController {
 		return periodList;
 
 	}
-	
 	
 	private Teacher getTeacherFromId(String teacherID, List<Teacher> teacherList) {
 		

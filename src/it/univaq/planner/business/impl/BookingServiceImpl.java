@@ -18,6 +18,7 @@ import it.univaq.planner.business.BookingService;
 import it.univaq.planner.business.RepeatService;
 import it.univaq.planner.business.ResourceService;
 import it.univaq.planner.business.model.Booking;
+import it.univaq.planner.business.model.Repeat;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -231,7 +232,7 @@ public class BookingServiceImpl implements BookingService {
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		Date firstDayOfWeek = cal.getTime();
 		
-		cal.add(Calendar.DATE, 7);
+		cal.add(Calendar.DATE, 6);
 		Date lastDayOfWeek = cal.getTime();
 		
 		Connection con = null;
@@ -240,8 +241,10 @@ public class BookingServiceImpl implements BookingService {
 		
 		try {
 			con = dataSource.getConnection();
-			st = con.prepareStatement("select b.* from bookings b, groups g, resources r where b.resource_id = r.id and r.group_id = g.id and g.id = ?");
+			st = con.prepareStatement("select b.*, rep.* from bookings b, groups g, resources r, repeats rep where b.resource_id = r.id and r.group_id = g.id and g.id = ? and b.id = rep.booking_id and rep.event_date_start >= ? and rep.event_date_end <= ?");
 			st.setLong(1, idGroup);
+			st.setDate(2, new java.sql.Date(firstDayOfWeek.getTime()));
+			st.setDate(3, new java.sql.Date(lastDayOfWeek.getTime()));
 			rs = st.executeQuery();
 			while (rs.next()) {
 				Booking bookingTemp = new Booking();
@@ -257,7 +260,7 @@ public class BookingServiceImpl implements BookingService {
 				bookingTemp.setResource(resourceService.getResourceById((Long) rs.getLong("resource_id")));
 				bookingTemp.setIdTipEvent((Short) rs.getShort("tip_event_id"));
 				bookingTemp.setIdUser((Long) rs.getLong("user_id"));
-				bookingTemp.setRepeatList(repeatService.getRepeatsByIdBooking(bookingTemp.getId()));
+				bookingTemp.setRepeatList(getRepeat(rs));
 				
 				bookingList.add(bookingTemp);
 			}
@@ -280,6 +283,20 @@ public class BookingServiceImpl implements BookingService {
 		}
 		
 		return bookingList;
+		
+	}
+
+	private List<Repeat> getRepeat(ResultSet rs) throws Exception {
+		
+		List<Repeat> repeatList = new ArrayList<Repeat>();
+		Repeat repeat = new Repeat();
+		repeat.setId((Long) rs.getLong("rep.id"));
+		repeat.setIdBooking((Long) rs.getLong("rep.booking_id"));
+		repeat.setIdTipBookingStatus((Short) rs.getShort("rep.tip_booking_status_id"));
+		repeat.setEventDateEnd((Date)(rs.getTimestamp("rep.event_date_end")));
+		repeat.setEventDateStart((Date)(rs.getTimestamp("rep.event_date_start")));
+		repeatList.add(repeat);
+		return repeatList;
 		
 	}
 

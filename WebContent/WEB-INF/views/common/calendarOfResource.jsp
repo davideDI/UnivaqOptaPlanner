@@ -87,7 +87,7 @@
         	  		<c:forEach items="${booking.repeatList}" var="repeat">
         	  			{
 	        	  			id         	: '${booking.id}',
-	                        title      	: '${booking.name}',
+	                        title      	: "${booking.name}",
 	                        description	: '${booking.description}',
 	                        start      	: moment('${repeat.eventDateStart}').format("YYYY-MM-DD HH:mm:ss"),
 	                        end        	: moment('${repeat.eventDateEnd}').format("YYYY-MM-DD HH:mm:ss"),

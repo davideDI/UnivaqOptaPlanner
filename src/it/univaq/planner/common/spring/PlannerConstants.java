@@ -7,6 +7,8 @@ public interface PlannerConstants {
 	public final static String URL_GROUP_ID = "/group/{idGroup}";
 	public final static String URL_BOOKING_ID_RESOURCE = "/bookings/{idResource}";
 	public final static String URL_VIEW_BOOKING_DO = "/viewBooking.do";
+	public final static String URL_ADMIN = "/admin";
+	public final static String URL_OPTIMIZATION_DO = "/optimization.do";
 	
 	//Redirect
 	public final static String REDIRECT_HOME = "redirect:/";
