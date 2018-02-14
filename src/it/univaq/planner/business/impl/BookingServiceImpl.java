@@ -19,6 +19,7 @@ import it.univaq.planner.business.RepeatService;
 import it.univaq.planner.business.ResourceService;
 import it.univaq.planner.business.model.Booking;
 import it.univaq.planner.business.model.Repeat;
+import it.univaq.planner.business.model.TipEvent;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -224,7 +225,7 @@ public class BookingServiceImpl implements BookingService {
 	 * Return the list of the current week
 	 */
 	@Override
-	public List<Booking> getAllBookingsByIdGroup(Long idGroup) throws Exception {
+	public List<Booking> getAllBookingsByIdGroup(Long idGroup, List<TipEvent> tipEventList) throws Exception {
 		
 		List<Booking> bookingList = new ArrayList<Booking>();
 		
@@ -241,10 +242,23 @@ public class BookingServiceImpl implements BookingService {
 		
 		try {
 			con = dataSource.getConnection();
-			st = con.prepareStatement("select b.*, rep.* from bookings b, groups g, resources r, repeats rep where b.resource_id = r.id and r.group_id = g.id and g.id = ? and b.id = rep.booking_id and rep.event_date_start >= ? and rep.event_date_end <= ?");
+			StringBuilder query = new StringBuilder();
+			query.append("select b.*, rep.* from bookings b, groups g, resources r, repeats rep where b.resource_id = r.id and r.group_id = g.id and g.id = ? and b.id = rep.booking_id and rep.event_date_start >= ? and rep.event_date_end <= ? and b.tip_event_id in (");
+			for (int i = 0; i < tipEventList.size(); i++) {
+				query.append("?");
+				if(i != tipEventList.size() - 1)
+					query.append(",");
+			}
+			query.append(")");
+			st = con.prepareStatement(query.toString());
 			st.setLong(1, idGroup);
 			st.setDate(2, new java.sql.Date(firstDayOfWeek.getTime()));
 			st.setDate(3, new java.sql.Date(lastDayOfWeek.getTime()));
+			int index = 4;
+			for (int j = 0; j < tipEventList.size(); j++) {
+				st.setShort(index++, tipEventList.get(j).getId());
+			}
+			
 			rs = st.executeQuery();
 			while (rs.next()) {
 				Booking bookingTemp = new Booking();

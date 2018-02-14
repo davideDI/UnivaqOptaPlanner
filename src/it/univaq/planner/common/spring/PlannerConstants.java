@@ -17,6 +17,7 @@ public interface PlannerConstants {
 	public final static String REDIRECT_HOME = "redirect:/";
 	
 	//Parameter
+	public final static String PARAMETER_MESSAGE_ERROR = ".generic.message.error";
 	public final static String PARAMETER_RESOURCE_ID = "resourceId";
 	public final static String PARAMETER_GROUP_ID = "groupId";
 	public final static String PARAMETER_OPTIMIZATION_COURSE_SUBMIT = "optimizationCourseSubmit";
@@ -30,6 +31,7 @@ public interface PlannerConstants {
 	public final static String VIEW_ADMIN_EXAM_INSERT_CONSTRAINT = "exam.insert.constraint";
 	
 	//View Object
+	public final static String MESSAGE_ERROR = "messageError";
 	public final static String GROUP_LIST = "groupList";
 	public final static String LOCALIZATION_COOKIE = "localizationCookie";
 	public final static String DEFAULT_VALUE_COOKIE = "it";

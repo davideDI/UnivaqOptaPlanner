@@ -24,6 +24,7 @@ import org.optaplanner.examples.curriculumcourse.domain.Room;
 import org.optaplanner.examples.curriculumcourse.domain.Teacher;
 import org.optaplanner.examples.curriculumcourse.domain.Timeslot;
 import org.optaplanner.examples.curriculumcourse.domain.UnavailablePeriodPenalty;
+import org.optaplanner.examples.examination.domain.Examination;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ import it.univaq.planner.business.model.Group;
 import it.univaq.planner.business.model.Repeat;
 import it.univaq.planner.business.model.Resource;
 import it.univaq.planner.business.model.TipBookingStatus;
+import it.univaq.planner.business.model.TipEvent;
 import it.univaq.planner.common.spring.PlannerConstants;
 
 @Controller
@@ -67,7 +69,7 @@ public class AdminController extends ABaseController {
 			mav.addObject(TIMESLOT_LIST, TIMES);
 			
 		} catch(Exception ex) {
-			ex.printStackTrace();
+			manageGenericError(mav, ex);
 		}
 		
 		return mav;
@@ -82,6 +84,7 @@ public class AdminController extends ABaseController {
 		mav.setViewName(VIEW_COMMON_CALENDAR_RESOURCE);
 		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
 		Calendar inizio = Calendar.getInstance();
+		
 		try {
 			
 			String resourceId = (String) request.getParameter(PARAMETER_OPTIMIZATION_COURSE_SUBMIT);
@@ -121,7 +124,7 @@ public class AdminController extends ABaseController {
 			System.out.println(bookingListByResource);
 	        
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			manageGenericError(mav, ex);
 		}
 		Calendar fine = Calendar.getInstance();
 		System.out.println("Inizio:" + inizio.getTime());
@@ -215,33 +218,6 @@ public class AdminController extends ABaseController {
 					bookingList.add(booking);
 				}
 			}
-			
-			System.out.println(bookingList);
-			
-//			if(courseList != null && !courseList.isEmpty()) {
-//				for (Course course : courseList) {
-//					Booking booking = new Booking();
-//					booking.setId(course.getId());
-//					booking.setSubjectID(course.getCode());
-//					booking.setTeacherID(course.getTeacher().getCode());
-//					booking.setCdsID(course.getCurriculumList().get(0).getCode());
-//					if(bestSolution.getLectureList() != null && !bestSolution.getLectureList().isEmpty()) {
-//						for (Lecture lectureTemp : bestSolution.getLectureList()) {
-//							Repeat repeat = new Repeat();
-//							repeat.setIdBooking(course.getId());
-//							repeat.setId(lectureTemp.getId());
-//							repeat.setIdTipBookingStatus(TipBookingStatus.InLavorazione.getId());
-//							setRepeatDate(lectureTemp, repeat);
-//							List<Repeat> repeatList = new ArrayList<Repeat>();
-//							repeatList.add(repeat);
-//							booking.setRepeatList(repeatList);
-//							if(booking.getResource() == null)
-//								booking.setResource(resourceService.getResourceById(lectureTemp.getRoom().getId()));
-//						}
-//					}
-//					bookingList.add(booking);
-//				}
-//			}
 			
 		}
 		
@@ -340,7 +316,11 @@ public class AdminController extends ABaseController {
 		List<Group> groupList = new ArrayList<Group>();
 		groupList.add(resource.getGroup());
 		
-		List<Booking> bookingList = bookingService.getAllBookingsByIdGroup(resource.getGroup().getId());
+		List<TipEvent> tipEventList = new ArrayList<TipEvent>();
+		tipEventList.add(TipEvent.Lezione);
+		tipEventList.add(TipEvent.Seminario);
+		tipEventList.add(TipEvent.Generico);
+		List<Booking> bookingList = bookingService.getAllBookingsByIdGroup(resource.getGroup().getId(), tipEventList);
 				
 		//CurriculumList
 		courseScheduleInput.setCurriculumList(getCurriculumList(bookingList));
@@ -674,7 +654,7 @@ public class AdminController extends ABaseController {
 			mav.addObject(TEACHER_LIST, teacherList);
 					
 		} catch(Exception ex) {
-			ex.printStackTrace();
+			manageGenericError(mav, ex);
 		}
 		
 		return mav;
@@ -689,14 +669,61 @@ public class AdminController extends ABaseController {
 		mav.setViewName(VIEW_COMMON_CALENDAR_RESOURCE);
 		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
 		
-		String resourceId = (String) request.getParameter(PARAMETER_OPTIMIZATION_EXAM_SUBMIT);
-		Long resourceIdL = 0L;
-		if(resourceId != null && !resourceId.isEmpty()) {
-			resourceIdL = new Long(resourceId);
+		Calendar inizio = Calendar.getInstance();
+		
+		try {
+			
+			String resourceId = (String) request.getParameter(PARAMETER_OPTIMIZATION_EXAM_SUBMIT);
+			Long resourceIdL = 0L;
+			if(resourceId != null && !resourceId.isEmpty()) {
+				resourceIdL = new Long(resourceId);
+			}
+			
+			Examination examination = getExamination(resourceIdL);
+			SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/examination/solver/examinationSolverConfig.xml");
+	        SolverConfig solverConfig = solverFactory.getSolverConfig();
+	        
+			String secondLimit = (String) request.getParameter(PARAMETER_SECOND_LIMIT);
+			if(secondLimit != null && !secondLimit.isEmpty()) {
+	        	solverConfig.getTerminationConfig().setMinutesSpentLimit(null);
+		        solverConfig.getTerminationConfig().setSecondsSpentLimit(Long.getLong(secondLimit));
+	        } else {
+	        	solverConfig.getTerminationConfig().setMinutesSpentLimit(null);
+		        solverConfig.getTerminationConfig().setSecondsSpentLimit(60L);
+	        }
+			
+			SolverConfigContext solverContext = new SolverConfigContext();
+			Solver<Examination> solver = solverConfig.buildSolver(solverContext);
+			
+			solver.solve(examination);
+			
+			Examination bestSolution = (Examination) solver.getBestSolution();
+			System.out.println(bestSolution);
+			
+		} catch(Exception ex) {
+			manageGenericError(mav, ex);
 		}
-		String secondLimit = (String) request.getParameter(PARAMETER_SECOND_LIMIT);
+		
+		Calendar fine = Calendar.getInstance();
+		System.out.println("Inizio:" + inizio.getTime());
+		System.out.println("Fine:" + fine.getTime());
 		
 		return mav;
+		
+	}
+
+	private Examination getExamination(Long resourceId) throws Exception {
+		
+		Examination examination = new Examination();
+		
+		Resource resource = resourceService.getResourceById(resourceId);
+		
+		List<TipEvent> tipEventList = new ArrayList<TipEvent>();
+		tipEventList.add(TipEvent.Esame);
+		
+		List<Booking> bookingList = bookingService.getAllBookingsByIdGroup(resource.getGroup().getId(), tipEventList);
+		
+		return examination;
 		
 	}
 		
