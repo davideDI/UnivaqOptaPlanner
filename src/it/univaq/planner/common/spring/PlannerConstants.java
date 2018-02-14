@@ -4,6 +4,7 @@ public interface PlannerConstants {
 
 	// Url
 	public final static String URL_LOGIN_DO = "/login.do";
+	public final static String URL_LOGIN_ERROR_DO = "/loginError.do";
 	public final static String URL_GROUP_ID = "/group/{idGroup}";
 	public final static String URL_BOOKING_ID_RESOURCE = "/bookings/{idResource}";
 	public final static String URL_VIEW_BOOKING_DO = "/viewBooking.do";
@@ -32,6 +33,7 @@ public interface PlannerConstants {
 	
 	//View Object
 	public final static String MESSAGE_ERROR = "messageError";
+	public final static String MESSAGE_ERROR_LOGIN = "messageErrorLogin";
 	public final static String GROUP_LIST = "groupList";
 	public final static String LOCALIZATION_COOKIE = "localizationCookie";
 	public final static String DEFAULT_VALUE_COOKIE = "it";

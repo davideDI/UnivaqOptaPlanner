@@ -35,6 +35,16 @@ public class HomeController extends ABaseController {
 		
 	}
 	
+	@RequestMapping(value=URL_LOGIN_ERROR_DO, method=RequestMethod.GET)
+	public ModelAndView getHomePageErrorLogin(HttpServletRequest request, HttpServletResponse response) {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName(VIEW_COMMON_INDEX);
+		mav.addObject(MESSAGE_ERROR_LOGIN, MESSAGE_ERROR_LOGIN);
+		return mav;
+		
+	}
+	
 	@RequestMapping(value=URL_VIEW_BOOKING_DO, method=RequestMethod.POST)
 	public ModelAndView getResourceByGroup( HttpServletRequest request, 
 											@CookieValue(value = LOCALIZATION_COOKIE) String localizationCookie) {

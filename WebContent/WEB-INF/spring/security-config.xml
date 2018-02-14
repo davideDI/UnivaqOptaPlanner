@@ -18,7 +18,8 @@
 		
 		<security:form-login login-page="/index" 
 							 default-target-url="/login.do"
-							 always-use-default-target="false"/>
+							 authentication-failure-url="/loginError.do"
+							 always-use-default-target="false" />
 
 	</security:http>
 
