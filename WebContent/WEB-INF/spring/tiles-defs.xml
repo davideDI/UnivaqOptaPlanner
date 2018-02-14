@@ -4,6 +4,7 @@
        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
 
 <tiles-definitions>
+
 	<definition name="standard" template="/WEB-INF/views/layout/layout.jsp">
 		<put-attribute name="menu" value="/WEB-INF/views/layout/menu.jsp" />
 		<put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp" />
@@ -17,8 +18,17 @@
 		<put-attribute name="body" value="/WEB-INF/views/common/calendarOfResource.jsp" />
 	</definition>
 	
-	<!-- EXCEPTION PAGES  --> 
+	<definition name="course.insert.constraint" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/common/admin/courseInsertConstraint.jsp" />
+	</definition>
 	
+	<definition name="exam.insert.constraint" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/common/admin/examInsertConstraint.jsp" />
+	</definition>
+	
+	
+	
+	<!-- EXCEPTION PAGES  --> 
 	<definition name="error.accessDenied" extends="standard">
 		<put-attribute name="body" value="/WEB-INF/views/exception/accessDenied.jsp"/>	
 	</definition>

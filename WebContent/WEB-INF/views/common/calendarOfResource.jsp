@@ -3,6 +3,9 @@
 <%@ page import="it.univaq.planner.common.spring.PlannerConstants" %>
 
 <c:set var="viewBookingDo" value="<%= PlannerConstants.URL_VIEW_BOOKING_DO %>" />
+<c:set var="urlAdmin" value="<%= PlannerConstants.URL_ADMIN %>" />
+<c:set var="examInsertConstraint" value="<%= PlannerConstants.URL_EXAM_INSERT_CONSTRAINT_DO %>" />
+<c:set var="courseInsertConstraint" value="<%= PlannerConstants.URL_COURSE_INSERT_CONSTRAINT_DO %>" />
 
 <div class="row">
 	
@@ -28,9 +31,19 @@
         <br>
         <div class="row">
              <div class="col-md-12">
-             	<form name="optimizationFomr" method="POST" role="form" action="${pageContext.request.contextPath}/admin/optimization.do">
-             		<button class="btn" name="optimizationSubmit" value="${firstResource.id}" >
-             			<spring:message code=".calendar.optimize" />
+             	<form name="optimizationCourseFomr" method="POST" role="form" action="${pageContext.request.contextPath}${urlAdmin}${courseInsertConstraint}">
+             		<button class="btn" name="optimizationCourseSubmit" value="${firstResource.id}" >
+             			<spring:message code=".calendar.optimize.course" />
+             		</button>
+             	</form>
+             </div>
+        </div>
+        <br>
+        <div class="row">
+             <div class="col-md-12">
+             	<form name="optimizationExamFomr" method="POST" role="form" action="${pageContext.request.contextPath}${urlAdmin}${examInsertConstraint}">
+             		<button class="btn" name="optimizationExamSubmit" value="${firstResource.id}" >
+             			<spring:message code=".calendar.optimize.exam" />
              		</button>
              	</form>
              </div>

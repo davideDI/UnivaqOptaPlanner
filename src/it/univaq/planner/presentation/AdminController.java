@@ -41,8 +41,41 @@ import it.univaq.planner.common.spring.PlannerConstants;
 @RequestMapping(value=PlannerConstants.URL_ADMIN)
 public class AdminController extends ABaseController {
 
-	@RequestMapping(value=URL_OPTIMIZATION_DO, method=RequestMethod.POST)
-	public ModelAndView optimizationBookings(	HttpServletRequest request, 
+	////////////////////////
+	//Optimize Courses
+	////////////////////////
+	@RequestMapping(value=URL_COURSE_INSERT_CONSTRAINT_DO, method=RequestMethod.POST)
+	public ModelAndView courseInsertConstraint(	HttpServletRequest request, 
+												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
+		mav.setViewName(VIEW_ADMIN_COURSE_INSERT_CONSTRAINT);
+		
+		try {
+			
+			String resourceId = (String) request.getParameter(PARAMETER_OPTIMIZATION_COURSE_SUBMIT);
+			Long resourceIdL = 0L;
+			if(resourceId != null && !resourceId.isEmpty()) {
+				resourceIdL = new Long(resourceId);
+			}
+			mav.addObject(ID_RESOURCE, resourceIdL);
+			
+			List<String> teacherList = bookingService.getDifferentTeacherIdByIdResource(resourceIdL);
+			mav.addObject(TEACHER_LIST, teacherList);
+			
+			mav.addObject(TIMESLOT_LIST, TIMES);
+			
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return mav;
+		
+	}
+	
+	@RequestMapping(value=URL_OPTIMIZATION_COURSE_DO, method=RequestMethod.POST)
+	public ModelAndView optimizationCourseDo(	HttpServletRequest request, 
 												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
 		
 		ModelAndView mav = new ModelAndView();
@@ -51,18 +84,27 @@ public class AdminController extends ABaseController {
 		Calendar inizio = Calendar.getInstance();
 		try {
 			
-			String resourceId = (String) request.getParameter("optimizationSubmit");
+			String resourceId = (String) request.getParameter(PARAMETER_OPTIMIZATION_COURSE_SUBMIT);
 			Long resourceIdL = 0L;
 			if(resourceId != null && !resourceId.isEmpty()) {
 				resourceIdL = new Long(resourceId);
 			}
 			
-			CourseSchedule courseSchedule = getCourseSchedule(resourceIdL);
+			List<String> teacherList = bookingService.getDifferentTeacherIdByIdResource(resourceIdL);
+			CourseSchedule courseSchedule = getCourseSchedule(resourceIdL, teacherList, request);
 			System.out.println(courseSchedule);
 			SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/curriculumcourse/solver/curriculumCourseSolverConfig.xml");
 	        SolverConfig solverConfig = solverFactory.getSolverConfig();
-	        solverConfig.getTerminationConfig().setMinutesSpentLimit(0L);
-	        solverConfig.getTerminationConfig().setSecondsSpentLimit(60L);
+	        
+	        String secondLimit = (String) request.getParameter(PARAMETER_SECOND_LIMIT);
+	        if(secondLimit != null && !secondLimit.isEmpty()) {
+	        	solverConfig.getTerminationConfig().setMinutesSpentLimit(null);
+		        solverConfig.getTerminationConfig().setSecondsSpentLimit(Long.getLong(secondLimit));
+	        } else {
+	        	solverConfig.getTerminationConfig().setMinutesSpentLimit(null);
+		        solverConfig.getTerminationConfig().setSecondsSpentLimit(60L);
+	        }
+	        
 	        SolverConfigContext solverContext = new SolverConfigContext();
 			Solver<CourseSchedule> solver = solverConfig.buildSolver(solverContext);
 	        solver.solve(courseSchedule);
@@ -208,8 +250,6 @@ public class AdminController extends ABaseController {
 		
 	}
 	
-	private static final String[] TIMES = {"09:00", "11:00", "14:00", "16:00", "18:00"};
-	
 	private void setRepeatDate(Lecture lectureTemp, Repeat repeat) {
 		
 		Period period = lectureTemp.getPeriod();
@@ -292,7 +332,7 @@ public class AdminController extends ABaseController {
 	Lecture [course=Course [code=F4I - TEORIA DELL'INFORMAZIONE - F0158 - 2015, teacher=003287, lectureSize=2, minWorkingDaySize=2, curriculumList=[F4I], studentSize=11], lectureIndexInCourse=0, locked=false, period=null, room=null]], 
 	score=null]
 			*/
-	private CourseSchedule getCourseSchedule(Long resourceId) throws Exception {
+	private CourseSchedule getCourseSchedule(Long resourceId, List<String> teacherList, HttpServletRequest request) throws Exception {
 		
 		CourseSchedule courseScheduleInput = new CourseSchedule();
 		
@@ -324,9 +364,65 @@ public class AdminController extends ABaseController {
 		//CourseList - LectureList
 		setCourseLectureList(bookingList, courseScheduleInput);
 		
-		courseScheduleInput.setUnavailablePeriodPenaltyList(new ArrayList<UnavailablePeriodPenalty>());
+		//UnavailablePeriodPenalty
+		setUnavaiblePeriod(courseScheduleInput, teacherList, request);
 
 		return courseScheduleInput;
+		
+	}
+	
+	private List<Course> getCourseFromTeacher(String teacherID, CourseSchedule courseScheduleInput) {
+		
+		List<Course> courseList = new ArrayList<Course>();
+		
+		for (Course course : courseScheduleInput.getCourseList()) {
+			if(course.getTeacher().getCode().equals(teacherID))
+				courseList.add(course);
+		}
+		
+		return courseList;
+		
+	}
+	
+	private void setUnavaiblePeriod(CourseSchedule courseScheduleInput, List<String> teacherList, HttpServletRequest request) {
+		
+		List<UnavailablePeriodPenalty> unavailablePeriodPenaltyList = new ArrayList<>(courseScheduleInput.getCourseList().size());
+        long penaltyId = 0L;
+        
+        for (String teacherTemp : teacherList) {
+			if(!teacherTemp.equalsIgnoreCase(N_D)) {
+				List<Course> courseList = getCourseFromTeacher(teacherTemp, courseScheduleInput);
+				if(courseList != null) {
+					String [] periodList = request.getParameterValues(teacherTemp);
+					if(periodList != null) {
+						for (Course course : courseList) {
+							for (int i = 0; i < periodList.length; i++) {
+								UnavailablePeriodPenalty penalty = new UnavailablePeriodPenalty();
+					            penalty.setId(penaltyId);
+					            penalty.setCourse(course);
+					            
+					            Period period = new Period();
+					            Day day = new Day();
+					            day.setId(penaltyId);
+					            day.setDayIndex(0);
+					            period.setDay(day);
+					            Timeslot timeslot = new Timeslot();
+					            timeslot.setId(penaltyId);
+					            timeslot.setTimeslotIndex(Integer.parseInt(periodList[i]));
+					            period.setTimeslot(timeslot);
+					            penalty.setPeriod(period);
+					            
+					            unavailablePeriodPenaltyList.add(penalty);
+					            penaltyId++;								
+							}
+						}
+					}
+				}
+			}
+		}
+        
+        courseScheduleInput.setUnavailablePeriodPenaltyList(unavailablePeriodPenaltyList);
+        System.out.println(unavailablePeriodPenaltyList);
 		
 	}
 	
@@ -549,6 +645,58 @@ public class AdminController extends ABaseController {
 			}
 		}
 		return null;
+		
+	}
+	
+	
+	////////////////////////
+	//Optimize Exams
+	////////////////////////
+	//TODO
+	@RequestMapping(value=URL_EXAM_INSERT_CONSTRAINT_DO, method=RequestMethod.POST)
+	public ModelAndView examInsertConstraint(	HttpServletRequest request, 
+												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
+		mav.setViewName(VIEW_ADMIN_EXAM_INSERT_CONSTRAINT);
+		
+		try {
+			
+			String resourceId = (String) request.getParameter(PARAMETER_OPTIMIZATION_EXAM_SUBMIT);
+			Long resourceIdL = 0L;
+			if(resourceId != null && !resourceId.isEmpty()) {
+				resourceIdL = new Long(resourceId);
+			}
+			mav.addObject(ID_RESOURCE, resourceIdL);
+			
+			List<String> teacherList = bookingService.getDifferentTeacherIdByIdResource(resourceIdL);
+			mav.addObject(TEACHER_LIST, teacherList);
+					
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return mav;
+		
+	}
+	
+	@RequestMapping(value=URL_OPTIMIZATION_EXAM_DO, method=RequestMethod.POST)
+	public ModelAndView optimizationExamDo(	HttpServletRequest request, 
+											@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName(VIEW_COMMON_CALENDAR_RESOURCE);
+		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
+		
+		String resourceId = (String) request.getParameter(PARAMETER_OPTIMIZATION_EXAM_SUBMIT);
+		Long resourceIdL = 0L;
+		if(resourceId != null && !resourceId.isEmpty()) {
+			resourceIdL = new Long(resourceId);
+		}
+		String secondLimit = (String) request.getParameter(PARAMETER_SECOND_LIMIT);
+		
+		return mav;
 		
 	}
 		
