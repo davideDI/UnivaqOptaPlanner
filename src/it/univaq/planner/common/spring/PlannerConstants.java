@@ -43,9 +43,12 @@ public interface PlannerConstants {
 	public final static String ID_RESOURCE = "idResource";
 	public final static String TEACHER_LIST = "teacherList";
 	public final static String TIMESLOT_LIST = "timeslotList";
+	public final static String DAY_WEEK_LIST = "dayWeekList";
 	
 	//Utility
 	public final static String N_D = "N.D.";
 	public static final String[] TIMES = {"09:00", "11:00", "14:00", "16:00", "18:00"};
+	public static final String[] WEEKDAYS = {"Mo", "Tu", "We", "Th", "Fr", "Sat", "Sun"};
+	public static final String _DAY = "_day";
 	
 }

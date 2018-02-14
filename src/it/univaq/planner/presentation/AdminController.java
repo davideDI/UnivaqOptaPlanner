@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,16 +64,29 @@ public class AdminController extends ABaseController {
 			}
 			mav.addObject(ID_RESOURCE, resourceIdL);
 			
-			List<String> teacherList = bookingService.getDifferentTeacherIdByIdResource(resourceIdL);
+			List<String> teacherList = bookingService.getDifferentTeacherIdByIdGroup(resourceService.getResourceById(resourceIdL).getGroup().getId());
 			mav.addObject(TEACHER_LIST, teacherList);
 			
 			mav.addObject(TIMESLOT_LIST, TIMES);
+			mav.addObject(DAY_WEEK_LIST, getListOfDaysWeek());
 			
 		} catch(Exception ex) {
 			manageGenericError(mav, ex);
 		}
 		
 		return mav;
+		
+	}
+	
+	private HashMap<Integer, Object> getListOfDaysWeek() {
+		
+		HashMap<Integer, Object> listOfDaysWeek = new HashMap<Integer, Object>();
+		
+		for (int i = 0; i < WEEKDAYS.length; i++) {
+			listOfDaysWeek.put(i, WEEKDAYS[i]);
+		}
+		
+		return listOfDaysWeek;
 		
 	}
 	
@@ -93,8 +107,7 @@ public class AdminController extends ABaseController {
 				resourceIdL = new Long(resourceId);
 			}
 			
-			List<String> teacherList = bookingService.getDifferentTeacherIdByIdResource(resourceIdL);
-			CourseSchedule courseSchedule = getCourseSchedule(resourceIdL, teacherList, request);
+			CourseSchedule courseSchedule = getCourseSchedule(resourceIdL, request);
 			System.out.println(courseSchedule);
 			SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/curriculumcourse/solver/curriculumCourseSolverConfig.xml");
 	        SolverConfig solverConfig = solverFactory.getSolverConfig();
@@ -308,13 +321,15 @@ public class AdminController extends ABaseController {
 	Lecture [course=Course [code=F4I - TEORIA DELL'INFORMAZIONE - F0158 - 2015, teacher=003287, lectureSize=2, minWorkingDaySize=2, curriculumList=[F4I], studentSize=11], lectureIndexInCourse=0, locked=false, period=null, room=null]], 
 	score=null]
 			*/
-	private CourseSchedule getCourseSchedule(Long resourceId, List<String> teacherList, HttpServletRequest request) throws Exception {
+	private CourseSchedule getCourseSchedule(Long resourceId, HttpServletRequest request) throws Exception {
 		
 		CourseSchedule courseScheduleInput = new CourseSchedule();
 		
 		Resource resource = resourceService.getResourceById(resourceId);
 		List<Group> groupList = new ArrayList<Group>();
 		groupList.add(resource.getGroup());
+		
+		List<String> teacherList = bookingService.getDifferentTeacherIdByIdGroup(resource.getGroup().getId());
 		
 		List<TipEvent> tipEventList = new ArrayList<TipEvent>();
 		tipEventList.add(TipEvent.Lezione);
@@ -374,26 +389,29 @@ public class AdminController extends ABaseController {
 				List<Course> courseList = getCourseFromTeacher(teacherTemp, courseScheduleInput);
 				if(courseList != null) {
 					String [] periodList = request.getParameterValues(teacherTemp);
-					if(periodList != null) {
+					String [] dayList = request.getParameterValues(teacherTemp + _DAY);
+					if(periodList != null && dayList != null) {
 						for (Course course : courseList) {
 							for (int i = 0; i < periodList.length; i++) {
-								UnavailablePeriodPenalty penalty = new UnavailablePeriodPenalty();
-					            penalty.setId(penaltyId);
-					            penalty.setCourse(course);
-					            
-					            Period period = new Period();
-					            Day day = new Day();
-					            day.setId(penaltyId);
-					            day.setDayIndex(0);
-					            period.setDay(day);
-					            Timeslot timeslot = new Timeslot();
-					            timeslot.setId(penaltyId);
-					            timeslot.setTimeslotIndex(Integer.parseInt(periodList[i]));
-					            period.setTimeslot(timeslot);
-					            penalty.setPeriod(period);
-					            
-					            unavailablePeriodPenaltyList.add(penalty);
-					            penaltyId++;								
+								for (int j = 0; j < dayList.length; j++) {
+									UnavailablePeriodPenalty penalty = new UnavailablePeriodPenalty();
+						            penalty.setId(penaltyId);
+						            penalty.setCourse(course);
+						            
+						            Period period = new Period();
+						            Day day = new Day();
+						            day.setId(penaltyId);
+						            day.setDayIndex(j);
+						            period.setDay(day);
+						            Timeslot timeslot = new Timeslot();
+						            timeslot.setId(penaltyId);
+						            timeslot.setTimeslotIndex(Integer.parseInt(periodList[i]));
+						            period.setTimeslot(timeslot);
+						            penalty.setPeriod(period);
+						            
+						            unavailablePeriodPenaltyList.add(penalty);
+						            penaltyId++;	
+								}
 							}
 						}
 					}
@@ -652,7 +670,10 @@ public class AdminController extends ABaseController {
 			
 			List<String> teacherList = bookingService.getDifferentTeacherIdByIdResource(resourceIdL);
 			mav.addObject(TEACHER_LIST, teacherList);
-					
+			
+			mav.addObject(TIMESLOT_LIST, TIMES);
+			mav.addObject(DAY_WEEK_LIST, getListOfDaysWeek());
+			
 		} catch(Exception ex) {
 			manageGenericError(mav, ex);
 		}
@@ -679,8 +700,9 @@ public class AdminController extends ABaseController {
 				resourceIdL = new Long(resourceId);
 			}
 			
+			//Examination examination = getExamination(resourceIdL);
 			Examination examination = getExamination(resourceIdL);
-			SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/examination/solver/examinationSolverConfig.xml");
+			SolverFactory<Examination> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/examination/solver/examinationSolverConfig.xml");
 	        SolverConfig solverConfig = solverFactory.getSolverConfig();
 	        
 			String secondLimit = (String) request.getParameter(PARAMETER_SECOND_LIMIT);

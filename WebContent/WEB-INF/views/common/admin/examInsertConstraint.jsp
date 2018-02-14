@@ -13,7 +13,7 @@
 	
 	<div class="row">
 	
-		<div class="col-md-3">
+		<div class="col-md-2">
 		
 			<c:forEach items="${teacherList}" var="teacher">
 				<c:if test="${teacher ne 'N.D.'}">
@@ -23,12 +23,25 @@
 			
 		</div>
 		
-		<div class="col-md-9">
+		<div class="col-md-4">
 			
 			<c:forEach items="${teacherList}" var="teacher">
 				<c:if test="${teacher ne 'N.D.'}">
 					<c:forEach items="${timeslotList}" var="timeslotTemp" varStatus="loop">
 						<input type="checkbox" value="${loop.index}" name="${teacher}" /><c:out value="${timeslotTemp}" />
+					</c:forEach>
+					<br>
+				</c:if>
+			</c:forEach>
+			
+		</div>
+		
+		<div class="col-md-4">
+			
+			<c:forEach items="${teacherList}" var="teacher">
+				<c:if test="${teacher ne 'N.D.'}">
+					<c:forEach items="${dayWeekList}" var="dayWeekListTemp" varStatus="loop">
+						<input type="checkbox" value="${dayWeekListTemp.key}" name="${teacher}_day" /><c:out value="${dayWeekListTemp.value}" />
 					</c:forEach>
 					<br>
 				</c:if>
@@ -49,6 +62,8 @@
 		</div>
 		
 	</div>
+	
+	<br>
 	
 	<div class="row">
 	

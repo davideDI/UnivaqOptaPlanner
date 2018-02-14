@@ -220,6 +220,47 @@ public class BookingServiceImpl implements BookingService {
 		return teacherList;
 		
 	}
+	
+	@Override
+	public List<String> getDifferentTeacherIdByIdGroup(Long idGroup) throws Exception {
+		
+List<String> teacherList = new ArrayList<String>();
+		
+		Connection con = null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			st = con.prepareStatement("select distinct(teacher_id) from bookings b, resources res where b.resource_id = res.id and res.group_id = ?");
+			st.setLong(1, idGroup);
+			rs = st.executeQuery();
+			while (rs.next()) {
+				
+				teacherList.add((String) rs.getString("teacher_id"));
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (st != null) {
+				try {
+					st.close();
+				} catch (SQLException e) {
+				}
+			}
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+				}
+			}
+
+		}
+		
+		return teacherList;
+		
+	}
 
 	/**
 	 * Return the list of the current week
