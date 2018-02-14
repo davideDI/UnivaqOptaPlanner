@@ -57,7 +57,7 @@
 	
 		<div class="col-md-12">
 			
-     		<button class="btn" name="optimizationCourseSubmit" value="${idResource}" >
+     		<button class="btn" name="optimizationCourseSubmit" value="${idResource}" id="optSubmit" >
      			<spring:message code=".calendar.optimize.course" />
      		</button>
 		
@@ -66,3 +66,17 @@
 	</div>
 
 </form>
+
+<script type="text/javascript">
+
+	$(document).ready(
+		function() {
+			$("#optSubmit").click(function() {
+				
+				$('#wait').show();
+		        $('#modale').fadeIn('fast');
+				
+			});
+		});
+
+</script>

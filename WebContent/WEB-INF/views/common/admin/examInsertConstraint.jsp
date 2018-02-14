@@ -27,8 +27,8 @@
 			
 			<c:forEach items="${teacherList}" var="teacher">
 				<c:if test="${teacher ne 'N.D.'}">
-					<c:forEach items="${timeslotList}" var="timeslotTemp">
-						<c:out value="${timeslotTemp}" />
+					<c:forEach items="${timeslotList}" var="timeslotTemp" varStatus="loop">
+						<input type="checkbox" value="${loop.index}" name="${teacher}" /><c:out value="${timeslotTemp}" />
 					</c:forEach>
 					<br>
 				</c:if>
@@ -54,7 +54,7 @@
 	
 		<div class="col-md-12">
 			
-     		<button class="btn" name="optimizationExamSubmit" value="${idResource}" >
+     		<button class="btn" name="optimizationExamSubmit" value="${idResource}" id="optSubmit" >
      			<spring:message code=".calendar.optimize.course" />
      		</button>
 		
@@ -63,3 +63,17 @@
 	</div>
 
 </form>
+
+<script type="text/javascript">
+
+	$(document).ready(
+		function() {
+			$("#optSubmit").click(function() {
+				
+				$('#wait').show();
+		        $('#modale').fadeIn('fast');
+				
+			});
+		});
+
+</script>
