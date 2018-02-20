@@ -95,7 +95,7 @@ public class AdminController extends ABaseController {
 												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
 		
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName(VIEW_COMMON_CALENDAR_RESOURCE);
+		mav.setViewName(VIEW_OPTIMIZATION_RESULT);
 		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
 		Calendar inizio = Calendar.getInstance();
 		
@@ -118,7 +118,7 @@ public class AdminController extends ABaseController {
 		        solverConfig.getTerminationConfig().setSecondsSpentLimit(Long.getLong(secondLimit));
 	        } else {
 	        	solverConfig.getTerminationConfig().setMinutesSpentLimit(null);
-		        solverConfig.getTerminationConfig().setSecondsSpentLimit(60L);
+		        solverConfig.getTerminationConfig().setSecondsSpentLimit(15L);
 	        }
 	        
 	        SolverConfigContext solverContext = new SolverConfigContext();
@@ -132,9 +132,8 @@ public class AdminController extends ABaseController {
 			mav.addObject(SELECTED_GROUP, resource.getGroup());
 			mav.addObject(FIRST_RESOURCE, resource);
 			List<Booking> bookingListFromBestSolution = getBookingsFromCourseSchedule(bestSolution);
-			List<Booking> bookingListByResource = getBookingByResource(bookingListFromBestSolution, resource);
-			mav.addObject(BOOKING_LIST, bookingListByResource);
-			System.out.println(bookingListByResource);
+			mav.addObject(BOOKING_LIST, bookingListFromBestSolution);
+			System.out.println(bookingListFromBestSolution);
 	        
 		} catch (Exception ex) {
 			manageGenericError(mav, ex);
@@ -350,7 +349,7 @@ public class AdminController extends ABaseController {
 		courseScheduleInput.setTimeslotList(getTimesList(5));
 
 		//DayList
-		List<Day> dayList = getDayList(5);
+		List<Day> dayList = getDayList(5, 5);
 		courseScheduleInput.setDayList(dayList);
 
 		//PeriodList
@@ -397,18 +396,7 @@ public class AdminController extends ABaseController {
 									UnavailablePeriodPenalty penalty = new UnavailablePeriodPenalty();
 						            penalty.setId(penaltyId);
 						            penalty.setCourse(course);
-						            
-						            Period period = new Period();
-						            Day day = new Day();
-						            day.setId(penaltyId);
-						            day.setDayIndex(j);
-						            period.setDay(day);
-						            Timeslot timeslot = new Timeslot();
-						            timeslot.setId(penaltyId);
-						            timeslot.setTimeslotIndex(Integer.parseInt(periodList[i]));
-						            period.setTimeslot(timeslot);
-						            penalty.setPeriod(period);
-						            
+						            penalty.setPeriod(getPeriodByDayAndTimesLot(courseScheduleInput, j, i));
 						            unavailablePeriodPenaltyList.add(penalty);
 						            penaltyId++;	
 								}
@@ -424,6 +412,19 @@ public class AdminController extends ABaseController {
 		
 	}
 	
+	private Period getPeriodByDayAndTimesLot(CourseSchedule courseScheduleInput, int dayIndex, int timeslotIndex) {
+		
+		List<Period> periodList = courseScheduleInput.getPeriodList();
+		if(periodList != null && !periodList.isEmpty()) {
+			for (Period period : periodList) {
+				if(period.getDay().getDayIndex() == dayIndex && period.getTimeslot().getTimeslotIndex() == timeslotIndex)
+					return period;
+			}
+		}
+		return null;
+		
+	}
+
 	private void setCourseLectureList(List<Booking> bookingList, CourseSchedule courseScheduleInput) {
 		
 		List<Course> courseList = new ArrayList<Course>();
@@ -436,8 +437,9 @@ public class AdminController extends ABaseController {
 				Course courseTemp = new Course();
 				if(booking.getRepeatList() != null) {
 					
-					//for lecture index
-					int i = 0;
+					//1 course has multiple lectures
+					int i = 1;
+					int lectureSize = booking.getRepeatList().size();
 					for (Repeat repeat : booking.getRepeatList()) {
 						
 						courseTemp.setId(booking.getId());
@@ -446,12 +448,12 @@ public class AdminController extends ABaseController {
 						curriculumListTemp.add(curriculumTemp);
 						courseTemp.setCurriculumList(curriculumListTemp);
 						
-						courseTemp.setMinWorkingDaySize(getRepeatDuration(repeat));
+						courseTemp.setMinWorkingDaySize(lectureSize);
 						
 						courseTemp.setStudentSize(booking.getNumStudents());
 						courseTemp.setTeacher(getTeacherFromId(booking.getTeacherID(), courseScheduleInput.getTeacherList()));
 						courseTemp.setCode(booking.getSubjectID());
-						courseTemp.setLectureSize(getRepeatDuration(repeat));
+						courseTemp.setLectureSize(lectureSize);
 						
 						Lecture lecture = new Lecture();
 						lecture.setLocked(false);
@@ -540,9 +542,7 @@ public class AdminController extends ABaseController {
 		
 	}
 	
-	//TODO
-	//manage vacation
-	private List<Day> getDayList(int numDay) {
+	private List<Day> getDayList(int numDay, int numsLot) {
 		
 		List<Day> dayList = new ArrayList<Day>();
 		int i = 0;
@@ -551,6 +551,7 @@ public class AdminController extends ABaseController {
 			dayTemp.setId(new Long(i));
 			dayTemp.setDayIndex(i);
 			i++;
+			dayTemp.setPeriodList(new ArrayList<Period>(numsLot));
 			dayList.add(dayTemp);
 		}
 		return dayList;
@@ -610,10 +611,20 @@ public class AdminController extends ABaseController {
 			int i = 0;
 			for (Day day : dayList) {
 				for (Timeslot timeslot : timeslotList) {
+					//It works
+//					if (day.getDayIndex() == 0 && timeslot.getTimeslotIndex() >= 2) {
+//	                    // No lectures Monday afternoon
+//	                    continue;
+//	                }
+//					if (day.getDayIndex() == 1 && timeslot.getTimeslotIndex() < 2) {
+//	                    // No lectures Monday afternoon
+//	                    continue;
+//	                }
 					Period periodTemp = new Period();
 					periodTemp.setId(new Long(i++));
 					periodTemp.setDay(day);
 					periodTemp.setTimeslot(timeslot);
+					day.getPeriodList().add(periodTemp);
 					periodList.add(periodTemp);
 				}
 			}

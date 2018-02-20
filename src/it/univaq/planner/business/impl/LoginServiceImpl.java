@@ -17,7 +17,6 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.ldap.filter.OrFilter;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import it.univaq.planner.business.LoginService;
@@ -50,12 +49,12 @@ public class LoginServiceImpl implements LoginService {
 				.or(new EqualsFilter("name", arg))
 				.or(new EqualsFilter("mail", arg));
 		
-		boolean authed = ldapTemplate.authenticate("",
-										orFilter.encode(),
-									    "");
-		
-		if(!authed) 
-			throw new UsernameNotFoundException("");
+//		boolean authed = ldapTemplate.authenticate("",
+//										orFilter.encode(),
+//									    "");
+//		
+//		if(!authed) 
+//			throw new UsernameNotFoundException("");
 		
 		@SuppressWarnings("unchecked")
 		List<User> templates = ldapTemplate.search("", orFilter.toString(), new AttributesMapper() {

@@ -1,6 +1,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ page import="it.univaq.planner.common.spring.PlannerConstants" %>
+<%@ page import="it.univaq.planner.business.model.TipEvent" %>
 
 <c:set var="viewBookingDo" value="<%= PlannerConstants.URL_VIEW_BOOKING_DO %>" />
 <c:set var="urlAdmin" value="<%= PlannerConstants.URL_ADMIN %>" />
@@ -48,6 +49,26 @@
              	</form>
              </div>
         </div>
+        
+        <br>
+        <div class="row">
+             <div class="col-md-12">
+             	<legend><spring:message code=".calendar.tip.events" /></legend>	
+             	<p><c:out value="<%= TipEvent.Esame.getName() %>" />&nbsp;&nbsp;
+                	<img width="17" height="17" class="img-circle" src="${pageContext.request.contextPath}/resources/images/palla_verde.jpg" />
+                </p>
+                <p><c:out value="<%= TipEvent.Lezione.getName() %>" />&nbsp;&nbsp;
+                	<img width="17" height="17" class="img-circle" src="${pageContext.request.contextPath}/resources/images/palla_rossa.jpg" />
+                </p>
+                <p><c:out value="<%= TipEvent.Seminario.getName() %>" />&nbsp;&nbsp;
+                    <img width="17" height="17" class="img-circle" src="${pageContext.request.contextPath}/resources/images/palla_gialla.jpg" />
+                </p>
+             	<p><c:out value="<%= TipEvent.Generico.getName() %>" />&nbsp;&nbsp;
+                    <img width="17" height="17" class="img-circle" src="${pageContext.request.contextPath}/resources/images/palla_blu.jpg" />
+                </p>
+             </div>
+        </div>
+        
 	</div>
 
     <!-- Div principale -->
@@ -104,7 +125,20 @@
 	                        description	: '${booking.description}',
 	                        start      	: moment('${repeat.eventDateStart}').format("YYYY-MM-DD HH:mm:ss"),
 	                        end        	: moment('${repeat.eventDateEnd}').format("YYYY-MM-DD HH:mm:ss"),
-	                        color 		: '#0000FF'
+	                        <c:choose>
+	                        	<c:when test="${booking.idTipEvent eq 1}">
+	                        		color : '#00FF00'
+	                        	</c:when>
+	                        	<c:when test="${booking.idTipEvent eq 2}">
+	                        		color : '#FF0000'
+	                        	</c:when>
+	                        	<c:when test="${booking.idTipEvent eq 3}">
+	                        		color : '#FFFF00'
+	                        	</c:when>
+	                        	<c:otherwise>
+	                        		color : '#0000FF'
+	                        	</c:otherwise>
+	                        </c:choose>
         	  			},
                  	</c:forEach>
   				</c:forEach>

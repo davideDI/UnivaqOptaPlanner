@@ -26,7 +26,9 @@
 		<put-attribute name="body" value="/WEB-INF/views/common/admin/examInsertConstraint.jsp" />
 	</definition>
 	
-	
+	<definition name="optimization.result" extends="standard">
+		<put-attribute name="body" value="/WEB-INF/views/common/admin/optimizationResult.jsp" />
+	</definition>
 	
 	<!-- EXCEPTION PAGES  --> 
 	<definition name="error.accessDenied" extends="standard">

@@ -30,6 +30,7 @@ public interface PlannerConstants {
 	public final static String VIEW_COMMON_CALENDAR_RESOURCE = "common.calendar.resource";
 	public final static String VIEW_ADMIN_COURSE_INSERT_CONSTRAINT = "course.insert.constraint";
 	public final static String VIEW_ADMIN_EXAM_INSERT_CONSTRAINT = "exam.insert.constraint";
+	public final static String VIEW_OPTIMIZATION_RESULT = "optimization.result";
 	
 	//View Object
 	public final static String MESSAGE_ERROR = "messageError";
@@ -50,7 +51,7 @@ public interface PlannerConstants {
 	//Utility
 	public final static String N_D = "N.D.";
 	public static final String[] TIMES = {"09:00", "11:00", "14:00", "16:00", "18:00"};
-	public static final String[] WEEKDAYS = {"Mo", "Tu", "We", "Th", "Fr", "Sat", "Sun"};
+	public static final String[] WEEKDAYS = {"Mo", "Tu", "We", "Th", "Fr", "Sat"};
 	public static final String _DAY = "_day";
 	
 }
