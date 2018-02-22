@@ -54,4 +54,8 @@ public interface PlannerConstants {
 	public static final String[] WEEKDAYS = {"Mo", "Tu", "We", "Th", "Fr", "Sat"};
 	public static final String _DAY = "_day";
 	
+	//Path Solver
+	public static final String PATH_CURRICULUM_SOLVER_CONFIG = "org/optaplanner/examples/curriculumcourse/solver/curriculumCourseSolverConfig.xml";
+	public static final String PATH_EXAM_SOLVER_CONFIG = "org/optaplanner/examples/examination/solver/examinationSolverConfig.xml";
+	
 }

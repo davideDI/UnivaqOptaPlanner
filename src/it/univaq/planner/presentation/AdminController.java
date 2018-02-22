@@ -25,7 +25,12 @@ import org.optaplanner.examples.curriculumcourse.domain.Room;
 import org.optaplanner.examples.curriculumcourse.domain.Teacher;
 import org.optaplanner.examples.curriculumcourse.domain.Timeslot;
 import org.optaplanner.examples.curriculumcourse.domain.UnavailablePeriodPenalty;
+import org.optaplanner.examples.examination.domain.Exam;
 import org.optaplanner.examples.examination.domain.Examination;
+import org.optaplanner.examples.examination.domain.PeriodPenalty;
+import org.optaplanner.examples.examination.domain.RoomPenalty;
+import org.optaplanner.examples.examination.domain.Student;
+import org.optaplanner.examples.examination.domain.Topic;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -109,7 +114,7 @@ public class AdminController extends ABaseController {
 			
 			CourseSchedule courseSchedule = getCourseSchedule(resourceIdL, request);
 			System.out.println(courseSchedule);
-			SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/curriculumcourse/solver/curriculumCourseSolverConfig.xml");
+			SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource(PATH_CURRICULUM_SOLVER_CONFIG);
 	        SolverConfig solverConfig = solverFactory.getSolverConfig();
 	        
 	        String secondLimit = (String) request.getParameter(PARAMETER_SECOND_LIMIT);
@@ -148,18 +153,6 @@ public class AdminController extends ABaseController {
 	//////////////////////////
 	// FROM COURSE SCHEDULE TO BOOKING
 	//////////////////////////
-	private List<Booking> getBookingByResource(List<Booking> bookingListFromBestSolution, Resource resource) {
-		
-		List<Booking> filteredList = new ArrayList<Booking>();
-		if(bookingListFromBestSolution != null) {
-			for (Booking booking : bookingListFromBestSolution) {
-				if(!booking.getResource().getId().equals(resource.getId()))
-					filteredList.add(booking);
-			}
-		}
-		return filteredList;
-		
-	}
 
 	//****** OUTPUT
 	/*
@@ -340,7 +333,7 @@ public class AdminController extends ABaseController {
 		courseScheduleInput.setCurriculumList(getCurriculumList(bookingList));
 		
 		//RoomList
-		courseScheduleInput.setRoomList(getRoomList(resourceService.getResourcesByIdGroup(resource.getGroup().getId())));
+		courseScheduleInput.setRoomList(getRoomListCourse(resourceService.getResourcesByIdGroup(resource.getGroup().getId())));
 		
 		//TeacherList
 		courseScheduleInput.setTeacherList(getTeacherList(bookingList));
@@ -491,7 +484,7 @@ public class AdminController extends ABaseController {
 		
 	}
 	
-	private List<Room> getRoomList(List<Resource> resourceList) {
+	private List<Room> getRoomListCourse(List<Resource> resourceList) {
 		
 		List<Room> roomList = new ArrayList<Room>();
 		if(resourceList != null && !resourceList.isEmpty()) {
@@ -661,7 +654,6 @@ public class AdminController extends ABaseController {
 	////////////////////////
 	//Optimize Exams
 	////////////////////////
-	//TODO
 	@RequestMapping(value=URL_EXAM_INSERT_CONSTRAINT_DO, method=RequestMethod.POST)
 	public ModelAndView examInsertConstraint(	HttpServletRequest request, 
 												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
@@ -698,7 +690,7 @@ public class AdminController extends ABaseController {
 											@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
 		
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName(VIEW_COMMON_CALENDAR_RESOURCE);
+		mav.setViewName(VIEW_OPTIMIZATION_RESULT);
 		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
 		
 		Calendar inizio = Calendar.getInstance();
@@ -711,9 +703,9 @@ public class AdminController extends ABaseController {
 				resourceIdL = new Long(resourceId);
 			}
 			
-			//Examination examination = getExamination(resourceIdL);
 			Examination examination = getExamination(resourceIdL);
-			SolverFactory<Examination> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/examination/solver/examinationSolverConfig.xml");
+			System.out.println(examination);
+			SolverFactory<Examination> solverFactory = SolverFactory.createFromXmlResource(PATH_EXAM_SOLVER_CONFIG);
 	        SolverConfig solverConfig = solverFactory.getSolverConfig();
 	        
 			String secondLimit = (String) request.getParameter(PARAMETER_SECOND_LIMIT);
@@ -722,7 +714,7 @@ public class AdminController extends ABaseController {
 		        solverConfig.getTerminationConfig().setSecondsSpentLimit(Long.getLong(secondLimit));
 	        } else {
 	        	solverConfig.getTerminationConfig().setMinutesSpentLimit(null);
-		        solverConfig.getTerminationConfig().setSecondsSpentLimit(60L);
+		        solverConfig.getTerminationConfig().setSecondsSpentLimit(15L);
 	        }
 			
 			SolverConfigContext solverContext = new SolverConfigContext();
@@ -747,16 +739,129 @@ public class AdminController extends ABaseController {
 
 	private Examination getExamination(Long resourceId) throws Exception {
 		
+		/*
+			private InstitutionParametrization institutionParametrization;
+		 */
 		Examination examination = new Examination();
 		
 		Resource resource = resourceService.getResourceById(resourceId);
 		
 		List<TipEvent> tipEventList = new ArrayList<TipEvent>();
 		tipEventList.add(TipEvent.Esame);
-		
 		List<Booking> bookingList = bookingService.getAllBookingsByIdGroup(resource.getGroup().getId(), tipEventList);
 		
+		//roomList
+		examination.setRoomList(getRoomListExamination(resourceService.getResourcesByIdGroup(resource.getGroup().getId())));
+		
+		//studentList
+		examination.setStudentList(getStudentList(bookingList));
+		
+		//periodList
+		examination.setPeriodList(getPeriodListExamination());
+		
+		//topicList
+		examination.setTopicList(getTopicList());
+		
+		//periodPenaltyList
+		examination.setPeriodPenaltyList(getPeriodPenaltyList());
+		
+		//roomPenaltyList
+		examination.setRoomPenaltyList(getRoomPenaltyList());
+		
+		//examList
+	    examination.setExamList(getExamList());
+		
 		return examination;
+		
+	}
+	
+	private List<Exam> getExamList() {
+		
+		List<Exam> examList = new ArrayList<Exam>();
+		
+		//TODO
+		
+		return examList;
+		
+	}
+	
+	private List<RoomPenalty> getRoomPenaltyList() {
+		
+		List<RoomPenalty> roomPenaltyList = new ArrayList<RoomPenalty>();
+		
+		//TODO
+		
+		return roomPenaltyList;
+		
+	}
+
+	private List<PeriodPenalty> getPeriodPenaltyList() {
+		
+		List<PeriodPenalty> periodPenalityList = new ArrayList<PeriodPenalty>();
+		
+		//TODO
+		
+		return periodPenalityList;
+		
+	}
+	
+	private List<Topic> getTopicList() {
+		
+		List<Topic> topicList = new ArrayList<Topic>();
+		
+		//TODO
+		
+		return topicList;
+		
+	}
+	
+	private List<org.optaplanner.examples.examination.domain.Period> getPeriodListExamination() {
+		
+		List<org.optaplanner.examples.examination.domain.Period> periodList = new ArrayList<org.optaplanner.examples.examination.domain.Period>();
+		
+		//TODO
+		
+		return periodList;
+		
+	}
+	
+	private List<Student> getStudentList(List<Booking> bookingList) {
+		
+		List<Student> studentList = new ArrayList<Student>();
+		int maxNumStudents = 0;
+		if(bookingList != null) {
+			for (Booking booking : bookingList) {
+				if(booking.getNumStudents() > maxNumStudents) {
+					maxNumStudents = booking.getNumStudents();
+				}
+			}
+		}
+		for (int i = 1; i <= maxNumStudents; i++) {
+			Student student = new Student();
+			student.setId((long)i);
+			studentList.add(student);
+		}
+		return studentList;
+		
+	}
+	
+	private int randomWithRange(int min, int max) {
+	   int range = (max - min) + 1;     
+	   return (int)(Math.random() * range) + min;
+	}
+
+	private List<org.optaplanner.examples.examination.domain.Room> getRoomListExamination(List<Resource> resourceList) {
+		
+		List<org.optaplanner.examples.examination.domain.Room> roomList = new ArrayList<org.optaplanner.examples.examination.domain.Room>();
+		if(resourceList != null && !resourceList.isEmpty()) {
+			for (Resource resource : resourceList) {
+				org.optaplanner.examples.examination.domain.Room roomTemp = new org.optaplanner.examples.examination.domain.Room();
+				roomTemp.setId(resource.getId());
+				roomTemp.setCapacity(resource.getCapacity());
+				roomList.add(roomTemp);
+			}
+		}
+		return roomList;
 		
 	}
 		
