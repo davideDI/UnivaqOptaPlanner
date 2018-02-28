@@ -757,10 +757,10 @@ public class AdminController extends ABaseController {
 		examination.setStudentList(getStudentList(bookingList));
 		
 		//periodList
-		examination.setPeriodList(getPeriodListExamination());
+		examination.setPeriodList(getPeriodListExamination(bookingList));
 		
 		//topicList
-		examination.setTopicList(getTopicList());
+		examination.setTopicList(getTopicList(bookingList), examination);
 		
 		//periodPenaltyList
 		examination.setPeriodPenaltyList(getPeriodPenaltyList());
@@ -805,17 +805,30 @@ public class AdminController extends ABaseController {
 		
 	}
 	
-	private List<Topic> getTopicList() {
+	private List<Topic> getTopicList(List<Booking> bookingList, Examination examination) {
 		
 		List<Topic> topicList = new ArrayList<Topic>();
 		
-		//TODO
+		long i = 0;
+		if(bookingList != null) {
+			for (Booking booking : bookingList) {
+				
+				for (Repeat repeat : booking.getRepeatList()) {
+					Topic topicTemp = new Topic();
+					topicTemp.setId(i++);
+					topicTemp.setDuration(getRepeatDuration(repeat));
+					topicTemp.setStudentiList(qui)
+					topicList.add(topicTemp);
+				}
+				
+			}
+		}
 		
 		return topicList;
 		
 	}
 	
-	private List<org.optaplanner.examples.examination.domain.Period> getPeriodListExamination() {
+	private List<org.optaplanner.examples.examination.domain.Period> getPeriodListExamination(List<Booking> bookingList) {
 		
 		List<org.optaplanner.examples.examination.domain.Period> periodList = new ArrayList<org.optaplanner.examples.examination.domain.Period>();
 		
