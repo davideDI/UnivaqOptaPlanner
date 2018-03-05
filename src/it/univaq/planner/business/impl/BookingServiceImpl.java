@@ -224,7 +224,7 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	public List<String> getDifferentTeacherIdByIdGroup(Long idGroup) throws Exception {
 		
-List<String> teacherList = new ArrayList<String>();
+		List<String> teacherList = new ArrayList<String>();
 		
 		Connection con = null;
 		PreparedStatement st = null;
@@ -271,11 +271,20 @@ List<String> teacherList = new ArrayList<String>();
 		List<Booking> bookingList = new ArrayList<Booking>();
 		
 		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
+		cal.clear(Calendar.MINUTE);
+		cal.clear(Calendar.SECOND);
+		cal.clear(Calendar.MILLISECOND);
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+		if(cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+			cal.add(Calendar.DATE, -6);
+		}
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		Date firstDayOfWeek = cal.getTime();
-		
-		cal.add(Calendar.DATE, 6);
+		System.out.println(firstDayOfWeek);
+		cal.add(Calendar.DATE, 7);
 		Date lastDayOfWeek = cal.getTime();
+		System.out.println(lastDayOfWeek);
 		
 		Connection con = null;
 		PreparedStatement st = null;
@@ -284,7 +293,7 @@ List<String> teacherList = new ArrayList<String>();
 		try {
 			con = dataSource.getConnection();
 			StringBuilder query = new StringBuilder();
-			query.append("select b.*, rep.* from bookings b, groups g, resources r, repeats rep where b.resource_id = r.id and r.group_id = g.id and g.id = ? and b.id = rep.booking_id and rep.event_date_start >= ? and rep.event_date_end <= ? and b.tip_event_id in (");
+			query.append("select b.*, rep.* from bookings b, groups g, resources r, repeats rep where b.resource_id = r.id and r.group_id = g.id and g.id = ? and b.id = rep.booking_id and rep.event_date_start >= ? and rep.event_date_end < ? and b.tip_event_id in (");
 			for (int i = 0; i < tipEventList.size(); i++) {
 				query.append("?");
 				if(i != tipEventList.size() - 1)

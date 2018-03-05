@@ -244,7 +244,7 @@ public class AdminController extends ABaseController {
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		System.out.println(cal.getTime());
 		
-		cal.add(Calendar.DATE, period.getDay().getDayIndex());
+		cal.add(Calendar.DATE, period.getDay().getDayIndex() + 1);
 		System.out.println(cal.getTime());
 		System.out.println(cal.get(Calendar.HOUR_OF_DAY));
 		System.out.println(cal.get(Calendar.MINUTE));
@@ -760,7 +760,7 @@ public class AdminController extends ABaseController {
 		examination.setPeriodList(getPeriodListExamination(bookingList));
 		
 		//topicList
-		examination.setTopicList(getTopicList(bookingList), examination);
+		//examination.setTopicList(getTopicList(bookingList), examination);
 		
 		//periodPenaltyList
 		examination.setPeriodPenaltyList(getPeriodPenaltyList());
@@ -817,7 +817,7 @@ public class AdminController extends ABaseController {
 					Topic topicTemp = new Topic();
 					topicTemp.setId(i++);
 					topicTemp.setDuration(getRepeatDuration(repeat));
-					topicTemp.setStudentiList(qui)
+					//topicTemp.setStudentiList(qui)
 					topicList.add(topicTemp);
 				}
 				

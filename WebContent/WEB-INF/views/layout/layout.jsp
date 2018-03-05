@@ -29,7 +29,7 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css">
 	<!-- Custom styles for our template -->
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap-theme.css" media="screen">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/fancybox/jquery.fancybox.css" type="text/css" media="screen" />
+	<%-- <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/fancybox/jquery.fancybox.css" type="text/css" media="screen" /> --%>
 
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/css/da-slider.css" />
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
@@ -41,8 +41,8 @@
 	
 	<link rel="stylesheet"	href="${pageContext.request.contextPath}/resources/jquery-ui/css/overcast/jquery-ui.min.css" />
 	
-	<link rel="stylesheet"	href="${pageContext.request.contextPath}/resources/datatables/css/bootstap.dataTables.css" />
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/datatables/css/jquery.dataTables.min.css" />
+	<%-- <link rel="stylesheet"	href="${pageContext.request.contextPath}/resources/datatables/css/bootstap.dataTables.css" />
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/datatables/css/jquery.dataTables.min.css" /> --%>
 	
 	
 	<!-- vecchio url per datatable -->
