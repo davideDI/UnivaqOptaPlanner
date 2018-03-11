@@ -17,13 +17,16 @@ import it.univaq.planner.business.RepeatService;
 import it.univaq.planner.business.model.Repeat;
 
 @Service
-public class RepeatServiceImpl implements RepeatService {
+public class RepeatServiceImpl extends AServiceImpl implements RepeatService {
 
 	@Autowired
 	private DataSource dataSource;
 	
 	@Override
 	public List<Repeat> getAllRepeats() throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("RepeatServiceImpl - getAllRepeats()");
 		
 		List<Repeat> repeatList = new ArrayList<Repeat>();
 		
@@ -47,18 +50,20 @@ public class RepeatServiceImpl implements RepeatService {
 				repeatList.add(repeatTemp);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("RepeatServiceImpl - getAllRepeats() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("RepeatServiceImpl - getAllRepeats() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("RepeatServiceImpl - getAllRepeats() - " + e.getMessage());
 				}
 			}
 
@@ -71,6 +76,9 @@ public class RepeatServiceImpl implements RepeatService {
 	@Override
 	public List<Repeat> getRepeatsByIdBooking(Long idBooking) throws Exception {
 
+		if(logger.isDebugEnabled())
+			logger.debug("RepeatServiceImpl - getRepeatsByIdBooking(idBooking: " + idBooking + ")");
+		
 		List<Repeat> repeatList = new ArrayList<Repeat>();
 		
 		Connection con = null;
@@ -93,18 +101,20 @@ public class RepeatServiceImpl implements RepeatService {
 				repeatList.add(repeatTemp);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("RepeatServiceImpl - getRepeatsByIdBooking() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("RepeatServiceImpl - getRepeatsByIdBooking() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("RepeatServiceImpl - getRepeatsByIdBooking() - " + e.getMessage());
 				}
 			}
 

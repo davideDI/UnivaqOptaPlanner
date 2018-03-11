@@ -56,6 +56,9 @@ public class AdminController extends ABaseController {
 	public ModelAndView courseInsertConstraint(	HttpServletRequest request, 
 												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - courseInsertConstraint()");
+		
 		ModelAndView mav = new ModelAndView();
 		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
 		mav.setViewName(VIEW_ADMIN_COURSE_INSERT_CONSTRAINT);
@@ -99,6 +102,9 @@ public class AdminController extends ABaseController {
 	public ModelAndView optimizationCourseDo(	HttpServletRequest request, 
 												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - optimizationCourseDo()");
+		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName(VIEW_OPTIMIZATION_RESULT);
 		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
@@ -113,7 +119,6 @@ public class AdminController extends ABaseController {
 			}
 			
 			CourseSchedule courseSchedule = getCourseSchedule(resourceIdL, request);
-			System.out.println(courseSchedule);
 			SolverFactory<CourseSchedule> solverFactory = SolverFactory.createFromXmlResource(PATH_CURRICULUM_SOLVER_CONFIG);
 	        SolverConfig solverConfig = solverFactory.getSolverConfig();
 	        
@@ -130,7 +135,6 @@ public class AdminController extends ABaseController {
 			Solver<CourseSchedule> solver = solverConfig.buildSolver(solverContext);
 	        solver.solve(courseSchedule);
 	        CourseSchedule bestSolution = (CourseSchedule) solver.getBestSolution();
-			System.out.println(bestSolution);
 	        Resource resource = resourceService.getResourceById(resourceIdL);
 	        List<Resource> resourceList = resourceService.getResourcesByIdGroup(resource.getGroup().getId());
 	        mav.addObject(RESOURCE_LIST, resourceList);
@@ -138,7 +142,6 @@ public class AdminController extends ABaseController {
 			mav.addObject(FIRST_RESOURCE, resource);
 			List<Booking> bookingListFromBestSolution = getBookingsFromCourseSchedule(bestSolution);
 			mav.addObject(BOOKING_LIST, bookingListFromBestSolution);
-			System.out.println(bookingListFromBestSolution);
 	        
 		} catch (Exception ex) {
 			manageGenericError(mav, ex);
@@ -192,23 +195,22 @@ public class AdminController extends ABaseController {
 			*/
 	private List<Booking> getBookingsFromCourseSchedule(CourseSchedule bestSolution) throws Exception {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getBookingsFromCourseSchedule(bestSolution: " + bestSolution + ")");
+		
 		List<Booking> bookingList = new ArrayList<Booking>();
 		if(bestSolution != null) {
 			
 			//Course -> Booking
 			//Lecture -> Repeat
-//			List<Course> courseList = bestSolution.getCourseList();
 			List<Lecture> lectureList = bestSolution.getLectureList();
 			if(lectureList != null) {
 				for (Lecture lectureTemp : bestSolution.getLectureList()) {
 					Booking booking = new Booking();
 					booking.setId(lectureTemp.getCourse().getId());
 					booking.setSubjectID(lectureTemp.getCourse().getCode());
-					System.out.println(booking.getSubjectID());
 					booking.setTeacherID(lectureTemp.getCourse().getTeacher().getCode());
-					System.out.println(booking.getTeacherID());
 					booking.setCdsID(lectureTemp.getCourse().getCurriculumList().get(0).getCode());
-					System.out.println(booking.getCdsID());
 					booking.setName(booking.getSubjectID() + booking.getTeacherID() + booking.getCdsID());
 					Repeat repeat = new Repeat();
 					repeat.setIdBooking(lectureTemp.getCourse().getId());
@@ -226,48 +228,34 @@ public class AdminController extends ABaseController {
 			
 		}
 		
-		System.out.println(bookingList);
 		return bookingList;
 		
 	}
 	
 	private void setRepeatDate(Lecture lectureTemp, Repeat repeat) {
 		
-		Period period = lectureTemp.getPeriod();
-		System.out.println(period);
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - setRepeatDate(lectureTemp: " + lectureTemp + ", " + "repeat: " + repeat + ")");
 		
+		Period period = lectureTemp.getPeriod();
 		SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
 		
 		Calendar cal = GregorianCalendar.getInstance();
-		System.out.println(cal.getTime());
-		
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
-		System.out.println(cal.getTime());
-		
 		cal.add(Calendar.DATE, period.getDay().getDayIndex() + 1);
-		System.out.println(cal.getTime());
-		System.out.println(cal.get(Calendar.HOUR_OF_DAY));
-		System.out.println(cal.get(Calendar.MINUTE));
-		System.out.println(cal.get(Calendar.SECOND));
 		
 		String hourStart = TIMES[period.getTimeslot().getTimeslotIndex()].substring(0,2);
 		String minuteStart = TIMES[period.getTimeslot().getTimeslotIndex()].substring(3,5);
 		
 		cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), Integer.valueOf(hourStart), Integer.valueOf(minuteStart), 0);
-		System.out.println(cal.getTime());
 		
 		Date dataInizio = cal.getTime();
-		System.out.println(dt.format(dataInizio));
 		Date dI = Timestamp.valueOf(dt.format(dataInizio));
-		System.out.println(dI);
 		repeat.setEventDateStart(dI);
 		
 		cal.add(Calendar.HOUR_OF_DAY, 2);
 		Date dataFine = cal.getTime();
-		System.out.println(dataFine);
-		System.out.println(dt.format(dataFine));
 		Date dF = Timestamp.valueOf(dt.format(dataFine));
-		System.out.println(dF);
 		repeat.setEventDateEnd(dF);
 
 	}
@@ -315,6 +303,9 @@ public class AdminController extends ABaseController {
 			*/
 	private CourseSchedule getCourseSchedule(Long resourceId, HttpServletRequest request) throws Exception {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getCourseSchedule(resourceId: " + resourceId + ")");
+		
 		CourseSchedule courseScheduleInput = new CourseSchedule();
 		
 		Resource resource = resourceService.getResourceById(resourceId);
@@ -360,6 +351,9 @@ public class AdminController extends ABaseController {
 	
 	private List<Course> getCourseFromTeacher(String teacherID, CourseSchedule courseScheduleInput) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getCourseFromTeacher(teacherID: " + teacherID + ", courseScheduleInput: " + courseScheduleInput + ")");
+		
 		List<Course> courseList = new ArrayList<Course>();
 		
 		for (Course course : courseScheduleInput.getCourseList()) {
@@ -372,6 +366,9 @@ public class AdminController extends ABaseController {
 	}
 	
 	private void setUnavaiblePeriod(CourseSchedule courseScheduleInput, List<String> teacherList, HttpServletRequest request) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - setUnavaiblePeriod(courseScheduleInput: " + courseScheduleInput + ", teacherList: " + teacherList + ")");
 		
 		List<UnavailablePeriodPenalty> unavailablePeriodPenaltyList = new ArrayList<>(courseScheduleInput.getCourseList().size());
         long penaltyId = 0L;
@@ -401,11 +398,13 @@ public class AdminController extends ABaseController {
 		}
         
         courseScheduleInput.setUnavailablePeriodPenaltyList(unavailablePeriodPenaltyList);
-        System.out.println(unavailablePeriodPenaltyList);
 		
 	}
 	
 	private Period getPeriodByDayAndTimesLot(CourseSchedule courseScheduleInput, int dayIndex, int timeslotIndex) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getPeriodByDayAndTimesLot(courseScheduleInput: " + courseScheduleInput + ", dayIndex: " + dayIndex + ", timeslotIndex: " + timeslotIndex + ")");
 		
 		List<Period> periodList = courseScheduleInput.getPeriodList();
 		if(periodList != null && !periodList.isEmpty()) {
@@ -419,6 +418,9 @@ public class AdminController extends ABaseController {
 	}
 
 	private void setCourseLectureList(List<Booking> bookingList, CourseSchedule courseScheduleInput) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - setCourseLectureList(bookingList: " + bookingList + ", courseScheduleInput: " + courseScheduleInput + ")");
 		
 		List<Course> courseList = new ArrayList<Course>();
 		List<Lecture> lectureList = new ArrayList<Lecture>();
@@ -468,6 +470,9 @@ public class AdminController extends ABaseController {
 	
 	private int getRepeatDuration(Repeat repeat) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getRepeatDuration(repeat: " + repeat + ")");
+		
 		long diff = repeat.getEventDateEnd().getTime() - repeat.getEventDateStart().getTime();
 
 		long diffSeconds = diff / 1000 % 60;  
@@ -486,6 +491,9 @@ public class AdminController extends ABaseController {
 	
 	private List<Room> getRoomListCourse(List<Resource> resourceList) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getRoomListCourse(resourceList: " + resourceList + ")");
+		
 		List<Room> roomList = new ArrayList<Room>();
 		if(resourceList != null && !resourceList.isEmpty()) {
 			for (Resource resource : resourceList) {
@@ -501,6 +509,9 @@ public class AdminController extends ABaseController {
 	}
 	
 	private List<Teacher> getTeacherList(List<Booking> bookingList) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getTeacherList(bookingList: " + bookingList + ")");
 		
 		List<String> teacherListString = new ArrayList<String>();
 		if(bookingList != null && !bookingList.isEmpty()) {
@@ -537,6 +548,9 @@ public class AdminController extends ABaseController {
 	
 	private List<Day> getDayList(int numDay, int numsLot) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getDayList(numDay: " + numDay + ", numsLot" + numsLot + ")");
+		
 		List<Day> dayList = new ArrayList<Day>();
 		int i = 0;
 		while(numDay > i) {
@@ -552,6 +566,9 @@ public class AdminController extends ABaseController {
 	}
 	
 	private List<Curriculum> getCurriculumList(List<Booking> bookingList) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getCurriculumList(bookingList: " + bookingList + ")");
 		
 		List<Curriculum> curriculumList = new ArrayList<Curriculum>();
 		if(bookingList != null && !bookingList.isEmpty()) {
@@ -583,6 +600,9 @@ public class AdminController extends ABaseController {
 	
 	private List<Timeslot> getTimesList(int numsLot) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getTimesList(numsLot: " + numsLot + ")");
+		
 		List<Timeslot> timesLotList = new ArrayList<Timeslot>();
 		int i = 0;
 		while(numsLot > i) {
@@ -599,12 +619,14 @@ public class AdminController extends ABaseController {
 	private List<Period> getPeriodList(List<Day> dayList,
 			List<Timeslot> timeslotList) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getPeriodList(dayList: " + dayList + ", timeslotList: " + timeslotList + ")");
+		
 		List<Period> periodList = new ArrayList<Period>();
 		if(dayList != null && !dayList.isEmpty() & timeslotList != null && !timeslotList.isEmpty()) {
 			int i = 0;
 			for (Day day : dayList) {
 				for (Timeslot timeslot : timeslotList) {
-					//It works
 //					if (day.getDayIndex() == 0 && timeslot.getTimeslotIndex() >= 2) {
 //	                    // No lectures Monday afternoon
 //	                    continue;
@@ -628,6 +650,9 @@ public class AdminController extends ABaseController {
 	
 	private Teacher getTeacherFromId(String teacherID, List<Teacher> teacherList) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getTeacherFromId(teacherID: " + teacherID + ", teacherList: " + teacherList + ")");
+		
 		if(teacherList != null && !teacherList.isEmpty()) {
 			for (Teacher teacher : teacherList) {
 				if(teacher.getCode().equals(teacherID))
@@ -639,6 +664,9 @@ public class AdminController extends ABaseController {
 	}
 	
 	private Curriculum getCurriculumFromBooking(Booking booking, CourseSchedule courseScheduleInput) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getCurriculumFromBooking(booking: " + booking + ", courseScheduleInput: " + courseScheduleInput + ")");
 		
 		if(courseScheduleInput != null && courseScheduleInput.getCurriculumList() != null && !courseScheduleInput.getCurriculumList().isEmpty()) {
 			for (Curriculum curriculum : courseScheduleInput.getCurriculumList()) {
@@ -657,6 +685,9 @@ public class AdminController extends ABaseController {
 	@RequestMapping(value=URL_EXAM_INSERT_CONSTRAINT_DO, method=RequestMethod.POST)
 	public ModelAndView examInsertConstraint(	HttpServletRequest request, 
 												@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - examInsertConstraint()");
 		
 		ModelAndView mav = new ModelAndView();
 		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
@@ -689,6 +720,9 @@ public class AdminController extends ABaseController {
 	public ModelAndView optimizationExamDo(	HttpServletRequest request, 
 											@CookieValue(LOCALIZATION_COOKIE) String localizationCookie) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - optimizationExamDo()");
+		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName(VIEW_OPTIMIZATION_RESULT);
 		mav.addObject(LOCALIZATION_COOKIE, localizationCookie);
@@ -704,7 +738,6 @@ public class AdminController extends ABaseController {
 			}
 			
 			Examination examination = getExamination(resourceIdL);
-			System.out.println(examination);
 			SolverFactory<Examination> solverFactory = SolverFactory.createFromXmlResource(PATH_EXAM_SOLVER_CONFIG);
 	        SolverConfig solverConfig = solverFactory.getSolverConfig();
 	        
@@ -723,7 +756,6 @@ public class AdminController extends ABaseController {
 			solver.solve(examination);
 			
 			Examination bestSolution = (Examination) solver.getBestSolution();
-			System.out.println(bestSolution);
 			
 		} catch(Exception ex) {
 			manageGenericError(mav, ex);
@@ -738,6 +770,9 @@ public class AdminController extends ABaseController {
 	}
 
 	private Examination getExamination(Long resourceId) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getExamination(resourceId: " + resourceId + ")");
 		
 		/*
 			private InstitutionParametrization institutionParametrization;
@@ -777,6 +812,9 @@ public class AdminController extends ABaseController {
 	
 	private List<Exam> getExamList() {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getExamList()");
+		
 		List<Exam> examList = new ArrayList<Exam>();
 		
 		//TODO
@@ -786,6 +824,9 @@ public class AdminController extends ABaseController {
 	}
 	
 	private List<RoomPenalty> getRoomPenaltyList() {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getRoomPenaltyList()");
 		
 		List<RoomPenalty> roomPenaltyList = new ArrayList<RoomPenalty>();
 		
@@ -797,6 +838,9 @@ public class AdminController extends ABaseController {
 
 	private List<PeriodPenalty> getPeriodPenaltyList() {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getPeriodPenaltyList()");
+		
 		List<PeriodPenalty> periodPenalityList = new ArrayList<PeriodPenalty>();
 		
 		//TODO
@@ -806,6 +850,9 @@ public class AdminController extends ABaseController {
 	}
 	
 	private List<Topic> getTopicList(List<Booking> bookingList, Examination examination) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getTopicList(bookingList: " + bookingList + ", examination:" + examination + ")");
 		
 		List<Topic> topicList = new ArrayList<Topic>();
 		
@@ -830,6 +877,9 @@ public class AdminController extends ABaseController {
 	
 	private List<org.optaplanner.examples.examination.domain.Period> getPeriodListExamination(List<Booking> bookingList) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getPeriodListExamination(bookingList: " + bookingList + ")");
+		
 		List<org.optaplanner.examples.examination.domain.Period> periodList = new ArrayList<org.optaplanner.examples.examination.domain.Period>();
 		
 		//TODO
@@ -839,6 +889,9 @@ public class AdminController extends ABaseController {
 	}
 	
 	private List<Student> getStudentList(List<Booking> bookingList) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getStudentList(bookingList: " + bookingList + ")");
 		
 		List<Student> studentList = new ArrayList<Student>();
 		int maxNumStudents = 0;
@@ -864,6 +917,9 @@ public class AdminController extends ABaseController {
 	}
 
 	private List<org.optaplanner.examples.examination.domain.Room> getRoomListExamination(List<Resource> resourceList) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getRoomListExamination(resourceList: " + resourceList + ")");
 		
 		List<org.optaplanner.examples.examination.domain.Room> roomList = new ArrayList<org.optaplanner.examples.examination.domain.Room>();
 		if(resourceList != null && !resourceList.isEmpty()) {

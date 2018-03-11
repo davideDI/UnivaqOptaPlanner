@@ -22,7 +22,7 @@ import it.univaq.planner.business.model.Repeat;
 import it.univaq.planner.business.model.TipEvent;
 
 @Service
-public class BookingServiceImpl implements BookingService {
+public class BookingServiceImpl extends AServiceImpl implements BookingService {
 
 	@Autowired
 	private DataSource dataSource;
@@ -36,6 +36,9 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	public List<Booking> getAllBookings() throws Exception {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("BookingServiceImpl - getAllBookings()");
+			
 		List<Booking> bookingList = new ArrayList<Booking>();
 		
 		Connection con = null;
@@ -65,18 +68,20 @@ public class BookingServiceImpl implements BookingService {
 				bookingList.add(bookingTemp);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("BookingServiceImpl - getAllBookings() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getAllBookings() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getAllBookings() - " + e.getMessage());
 				}
 			}
 
@@ -88,6 +93,9 @@ public class BookingServiceImpl implements BookingService {
 
 	@Override
 	public List<String> getDifferentTeacherId() throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("BookingServiceImpl - getDifferentTeacherId()");
 		
 		List<String> teacherList = new ArrayList<String>();
 		
@@ -105,18 +113,20 @@ public class BookingServiceImpl implements BookingService {
 				
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("BookingServiceImpl - getDifferentTeacherId() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getDifferentTeacherId() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getDifferentTeacherId() - " + e.getMessage());
 				}
 			}
 
@@ -128,6 +138,9 @@ public class BookingServiceImpl implements BookingService {
 
 	@Override
 	public List<Booking> getAllBookingsByIdResource(Long idResource) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("BookingServiceImpl - getAllBookingsByIdResource(idResource: " + idResource + ")");
 		
 		List<Booking> bookingList = new ArrayList<Booking>();
 		
@@ -159,18 +172,20 @@ public class BookingServiceImpl implements BookingService {
 				bookingList.add(bookingTemp);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("BookingServiceImpl - getAllBookingsByIdResource() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getAllBookingsByIdResource() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getAllBookingsByIdResource() - " + e.getMessage());
 				}
 			}
 
@@ -182,6 +197,9 @@ public class BookingServiceImpl implements BookingService {
 
 	@Override
 	public List<String> getDifferentTeacherIdByIdResource(Long idResource) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("BookingServiceImpl - getDifferentTeacherIdByIdResource(idResource: " + idResource + ")");
 		
 		List<String> teacherList = new ArrayList<String>();
 		
@@ -200,18 +218,20 @@ public class BookingServiceImpl implements BookingService {
 				
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("BookingServiceImpl - getDifferentTeacherIdByIdResource() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdResource() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdResource() - " + e.getMessage());
 				}
 			}
 
@@ -223,6 +243,9 @@ public class BookingServiceImpl implements BookingService {
 	
 	@Override
 	public List<String> getDifferentTeacherIdByIdGroup(Long idGroup) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("BookingServiceImpl - getDifferentTeacherIdByIdGroup(idGroup: " + idGroup + ")");
 		
 		List<String> teacherList = new ArrayList<String>();
 		
@@ -241,18 +264,20 @@ public class BookingServiceImpl implements BookingService {
 				
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
 				}
 			}
 
@@ -268,6 +293,9 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	public List<Booking> getAllBookingsByIdGroup(Long idGroup, List<TipEvent> tipEventList) throws Exception {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("BookingServiceImpl - getAllBookingsByIdGroup(idGroup: " + idGroup + ", tipEventList: " + tipEventList + ")");
+		
 		List<Booking> bookingList = new ArrayList<Booking>();
 		
 		Calendar cal = Calendar.getInstance();
@@ -281,10 +309,8 @@ public class BookingServiceImpl implements BookingService {
 		}
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		Date firstDayOfWeek = cal.getTime();
-		System.out.println(firstDayOfWeek);
 		cal.add(Calendar.DATE, 7);
 		Date lastDayOfWeek = cal.getTime();
-		System.out.println(lastDayOfWeek);
 		
 		Connection con = null;
 		PreparedStatement st = null;
@@ -329,18 +355,20 @@ public class BookingServiceImpl implements BookingService {
 				bookingList.add(bookingTemp);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("BookingServiceImpl - getAllBookingsByIdGroup() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getAllBookingsByIdGroup() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getAllBookingsByIdGroup() - " + e.getMessage());
 				}
 			}
 
@@ -351,6 +379,9 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	private List<Repeat> getRepeat(ResultSet rs) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("BookingServiceImpl - getRepeat(rs: " + rs + ")");
 		
 		List<Repeat> repeatList = new ArrayList<Repeat>();
 		Repeat repeat = new Repeat();

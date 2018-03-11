@@ -17,7 +17,7 @@ import it.univaq.planner.business.ResourceService;
 import it.univaq.planner.business.model.Resource;
 
 @Service
-public class ResourceServiceImpl implements ResourceService {
+public class ResourceServiceImpl extends AServiceImpl implements ResourceService {
 
 	@Autowired
 	private DataSource dataSource;
@@ -27,6 +27,9 @@ public class ResourceServiceImpl implements ResourceService {
 	
 	@Override
 	public Resource getResourceById(Long id) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("ResourceServiceImpl - getResourceById(id: " + id + ")");
 		
 		Connection con = null;
 		PreparedStatement st = null;
@@ -68,18 +71,20 @@ public class ResourceServiceImpl implements ResourceService {
 				
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("ResourceServiceImpl - getResourceById() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("ResourceServiceImpl - getResourceById() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("ResourceServiceImpl - getResourceById() - " + e.getMessage());
 				}
 			}
 
@@ -91,6 +96,9 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Override
 	public List<Resource> getAllResources() throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("ResourceServiceImpl - getAllResources()");
 		
 		Connection con = null;
 		PreparedStatement st = null;
@@ -133,18 +141,20 @@ public class ResourceServiceImpl implements ResourceService {
 				
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("ResourceServiceImpl - getAllResources() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("ResourceServiceImpl - getAllResources() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("ResourceServiceImpl - getAllResources() - " + e.getMessage());
 				}
 			}
 
@@ -157,6 +167,9 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Override
 	public List<Resource> getResourcesByIdGroup(Long idGroup) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("ResourceServiceImpl - getResourcesByIdGroup(idGroup: " + idGroup + ")");
 		
 		Connection con = null;
 		PreparedStatement st = null;
@@ -200,18 +213,20 @@ public class ResourceServiceImpl implements ResourceService {
 				
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("ResourceServiceImpl - getResourcesByIdGroup() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("ResourceServiceImpl - getResourcesByIdGroup() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("ResourceServiceImpl - getResourcesByIdGroup() - " + e.getMessage());
 				}
 			}
 

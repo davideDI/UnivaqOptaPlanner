@@ -10,20 +10,24 @@ public class HttpErrorsController extends ABaseController {
 	public String notFound() {
 		
 		logger.error("HttpErrorsController - notFound()");
-		
 		return "notFound";
+		
 	}
 	
 	@RequestMapping(value="4xx")
 	public String clientError() {
 		
+		logger.error("HttpErrorsController - clientError() - 4XX");
 		return "clientError";
+		
 	}
 	
 	@RequestMapping(value="5xx")
 	public String serverError() {
 		
+		logger.error("HttpErrorsController - serverError() - 5XX");
 		return "serverError";
+		
 	}
 	
 }

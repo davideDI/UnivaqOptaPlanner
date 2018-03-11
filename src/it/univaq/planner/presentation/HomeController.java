@@ -22,6 +22,9 @@ public class HomeController extends ABaseController {
 	@RequestMapping(value=URL_LOGIN_DO, method=RequestMethod.GET)
 	public String getHomePage(HttpServletRequest request, HttpServletResponse response) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("HomeController - getHomePage()");
+		
 		try {
 		
 			request.getSession().setAttribute(GROUP_LIST, groupService.getAllGroups());
@@ -38,6 +41,9 @@ public class HomeController extends ABaseController {
 	@RequestMapping(value=URL_LOGIN_ERROR_DO, method=RequestMethod.GET)
 	public ModelAndView getHomePageErrorLogin(HttpServletRequest request, HttpServletResponse response) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("HomeController - getHomePageErrorLogin()");
+		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName(VIEW_COMMON_INDEX);
 		mav.addObject(MESSAGE_ERROR_LOGIN, MESSAGE_ERROR_LOGIN);
@@ -48,6 +54,9 @@ public class HomeController extends ABaseController {
 	@RequestMapping(value=URL_VIEW_BOOKING_DO, method=RequestMethod.POST)
 	public ModelAndView getResourceByGroup( HttpServletRequest request, 
 											@CookieValue(value = LOCALIZATION_COOKIE) String localizationCookie) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("HomeController - getResourceByGroup()");
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName(VIEW_COMMON_CALENDAR_RESOURCE);
@@ -69,7 +78,6 @@ public class HomeController extends ABaseController {
 					Resource selectedResource = resourceList.get(0);
 					mav.addObject(FIRST_RESOURCE, selectedResource);
 					List<Booking> bookingList = bookingService.getAllBookingsByIdResource(selectedResource.getId());
-					System.out.println(bookingList);
 					mav.addObject(BOOKING_LIST, bookingList);
 				}
 			}

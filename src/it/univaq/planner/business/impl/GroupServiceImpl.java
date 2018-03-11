@@ -16,13 +16,16 @@ import it.univaq.planner.business.GroupService;
 import it.univaq.planner.business.model.Group;
 
 @Service
-public class GroupServiceImpl implements GroupService {
+public class GroupServiceImpl extends AServiceImpl implements GroupService {
 
 	@Autowired
 	private DataSource dataSource;
 	
 	@Override
 	public List<Group> getAllGroups() throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("GroupServiceImpl - getAllGroups()");
 		
 		Connection con = null;
 		PreparedStatement st = null;
@@ -43,18 +46,20 @@ public class GroupServiceImpl implements GroupService {
 				groupList.add(group);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("GroupServiceImpl - getAllGroups() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("GroupServiceImpl - getAllGroups() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("GroupServiceImpl - getAllGroups() - " + e.getMessage());
 				}
 			}
 
@@ -66,6 +71,9 @@ public class GroupServiceImpl implements GroupService {
 
 	@Override
 	public Group getGroupById(Long id) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("GroupServiceImpl - getAllGroups(id: " + id + ")");
 		
 		Connection con = null;
 		PreparedStatement st = null;
@@ -87,18 +95,20 @@ public class GroupServiceImpl implements GroupService {
 				
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("GroupServiceImpl - getGroupById() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("GroupServiceImpl - getGroupById() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("GroupServiceImpl - getGroupById() - " + e.getMessage());
 				}
 			}
 

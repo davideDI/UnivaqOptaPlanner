@@ -23,6 +23,7 @@ public abstract class ABaseController implements PlannerConstants  {
 	
 	protected void manageGenericError(ModelAndView mav, Exception ex) {
 		
+		logger.error("Error: " + mav.getViewName() + " - " + ex.getMessage());
 		ex.printStackTrace();
 		mav.setViewName(VIEW_COMMON_INDEX);
 		mav.addObject(MESSAGE_ERROR, PARAMETER_MESSAGE_ERROR);

@@ -24,13 +24,16 @@ import it.univaq.planner.business.model.Role;
 import it.univaq.planner.business.model.User;
 
 @Service
-public class LoginServiceImpl implements LoginService {
+public class LoginServiceImpl extends AServiceImpl implements LoginService {
 
 	@Autowired
 	private DataSource dataSource;
 	
 	@Override
-	public User authenticate(String arg) throws Exception {
+	public User authenticate(String username) throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("LoginServiceImpl - authenticate(username: " + username + ")");
 		
 		LdapContextSource contextSource = new LdapContextSource();
 		contextSource.setUrl("ldap://localhost:389");
@@ -43,12 +46,13 @@ public class LoginServiceImpl implements LoginService {
 		ldapTemplate.afterPropertiesSet();
 
 		OrFilter orFilter = new OrFilter();
-		orFilter.or(new EqualsFilter("uid", arg))
-				.or(new EqualsFilter("samaccountname", arg))
-				.or(new EqualsFilter("cn", arg))
-				.or(new EqualsFilter("name", arg))
-				.or(new EqualsFilter("mail", arg));
+		orFilter.or(new EqualsFilter("uid", username))
+				.or(new EqualsFilter("samaccountname", username))
+				.or(new EqualsFilter("cn", username))
+				.or(new EqualsFilter("name", username))
+				.or(new EqualsFilter("mail", username));
 		
+		//Non è possibile effettuare il bind su Ldap senza pass inserita dall'utente
 //		boolean authed = ldapTemplate.authenticate("",
 //										orFilter.encode(),
 //									    "");
@@ -92,6 +96,9 @@ public class LoginServiceImpl implements LoginService {
 	
 	private List<Role> getRoles(String cn) {
 		
+		if(logger.isDebugEnabled())
+			logger.debug("LoginServiceImpl - getRoles(cn: " + cn + ")");
+		
 		List<Role> roles = new ArrayList<>();
 		
 		Connection con = null;
@@ -111,18 +118,20 @@ public class LoginServiceImpl implements LoginService {
 				roles.add(roleTemp);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("LoginServiceImpl - getRoles() - " + e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					logger.error("LoginServiceImpl - getRoles() - " + e.getMessage());
 				}
 			}
 			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
+					logger.error("LoginServiceImpl - getRoles() - " + e.getMessage());
 				}
 			}
 
