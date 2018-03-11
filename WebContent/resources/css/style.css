@@ -411,9 +411,7 @@ footer {
 }
 .footer2 {
 	background: #222;
-	padding: 15px 0;
 	color: #aaa;
-	font-size: 12px;
 }
 .footer2 a {
 	color: #aaa;
@@ -421,9 +419,7 @@ footer {
 .footer2 a:hover {
 	color: #fff;
 }
-.footer2 p {
-	margin: 0;
-}
+
 .panel-simplenav {
 	margin-left: -5px;
 }

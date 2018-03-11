@@ -1,6 +1,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
-<footer class="footer2" style=" clear: both; width: 100%; padding: 10px 0px; height: 70px">	
+<footer class="footer2 page-footer font-small blue pt-4 mt-4" style=" clear: both; width: 100%; padding: 10px 0px; height: 70px">	
 	<div class="container-fluid text-center text-md-left">
         <div class="row">
           <div class="col-md-2"></div>
@@ -18,7 +18,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/modernizr-latest.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/jquery.cslider.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/custom.js"></script>
+<%-- <script src="${pageContext.request.contextPath}/resources/js/custom.js"></script> --%>
 
 <!-- Select2 -->
 <link href="${pageContext.request.contextPath}/resources/select2-4.0.3/dist/css/select2.min.css" rel="stylesheet" />

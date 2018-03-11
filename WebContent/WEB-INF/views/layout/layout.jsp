@@ -42,25 +42,25 @@
 		<script type="text/javascript" src="https://cdn.datatables.net/responsive/1.0.7/js/dataTables.responsive.min.js"></script>
 	</head>
 
-	<body style="height: 100%;">
+	<body>
 	
 		<div class="container-liquid" style="min-height: 100%;  height: 100%; margin: 0 auto -70px; ">
 			
 			<tiles:insertAttribute name="menu" />
 			
-			<tiles:insertAttribute name="divGif" />
-			
-			<tiles:insertAttribute name="divMessagesError" />
-			
 			<div class="container-fluid">
 				
 				<div class="row">
-                    <div class="col-md-1"></div>
-                        <div class="col-md-10">
-                        
-							<tiles:insertAttribute name="body" />
-							
-						</div>
+                     <div class="col-md-1"></div>
+                     <div class="col-md-10">
+                     
+                     	<tiles:insertAttribute name="divGif" />
+
+						<tiles:insertAttribute name="divMessagesError" />
+                     
+						<tiles:insertAttribute name="body" />
+				
+					</div>
                     <div class="col-md-1"></div>
                 </div>
                 
