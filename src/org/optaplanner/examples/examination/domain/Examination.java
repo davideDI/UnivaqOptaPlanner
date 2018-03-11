@@ -158,4 +158,12 @@ public class Examination extends AbstractPersistable {
         return topicConflictList;
     }
 
+	@Override
+	public String toString() {
+		return "Examination [institutionParametrization=" + institutionParametrization + ", studentList=" + studentList
+				+ ", topicList=" + topicList + ", periodList=" + periodList + ", roomList=" + roomList
+				+ ", periodPenaltyList=" + periodPenaltyList + ", roomPenaltyList=" + roomPenaltyList + ", examList="
+				+ examList + ", score=" + score + "]";
+	}
+
 }

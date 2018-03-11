@@ -47,9 +47,9 @@ public class Room extends AbstractPersistable implements Labeled {
         return Long.toString(id);
     }
 
-    @Override
-    public String toString() {
-        return Long.toString(id);
-    }
+	@Override
+	public String toString() {
+		return "Room [id= " + getLabel() + ", capacity=" + capacity + ", penalty=" + penalty + "]";
+	}
 
 }

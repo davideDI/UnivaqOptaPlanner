@@ -195,98 +195,6 @@ public class BookingServiceImpl extends AServiceImpl implements BookingService {
 		
 	}
 
-	@Override
-	public List<String> getDifferentTeacherIdByIdResource(Long idResource) throws Exception {
-		
-		if(logger.isDebugEnabled())
-			logger.debug("BookingServiceImpl - getDifferentTeacherIdByIdResource(idResource: " + idResource + ")");
-		
-		List<String> teacherList = new ArrayList<String>();
-		
-		Connection con = null;
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		
-		try {
-			con = dataSource.getConnection();
-			st = con.prepareStatement("select distinct(teacher_id) from bookings where resource_id = ?");
-			st.setLong(1, idResource);
-			rs = st.executeQuery();
-			while (rs.next()) {
-				
-				teacherList.add((String) rs.getString("teacher_id"));
-				
-			}
-		} catch (SQLException e) {
-			logger.error("BookingServiceImpl - getDifferentTeacherIdByIdResource() - " + e.getMessage());
-		} finally {
-			if (st != null) {
-				try {
-					st.close();
-				} catch (SQLException e) {
-					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdResource() - " + e.getMessage());
-				}
-			}
-			if (con != null) {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdResource() - " + e.getMessage());
-				}
-			}
-
-		}
-		
-		return teacherList;
-		
-	}
-	
-	@Override
-	public List<String> getDifferentTeacherIdByIdGroup(Long idGroup) throws Exception {
-		
-		if(logger.isDebugEnabled())
-			logger.debug("BookingServiceImpl - getDifferentTeacherIdByIdGroup(idGroup: " + idGroup + ")");
-		
-		List<String> teacherList = new ArrayList<String>();
-		
-		Connection con = null;
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		
-		try {
-			con = dataSource.getConnection();
-			st = con.prepareStatement("select distinct(teacher_id) from bookings b, resources res where b.resource_id = res.id and res.group_id = ?");
-			st.setLong(1, idGroup);
-			rs = st.executeQuery();
-			while (rs.next()) {
-				
-				teacherList.add((String) rs.getString("teacher_id"));
-				
-			}
-		} catch (SQLException e) {
-			logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
-		} finally {
-			if (st != null) {
-				try {
-					st.close();
-				} catch (SQLException e) {
-					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
-				}
-			}
-			if (con != null) {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
-				}
-			}
-
-		}
-		
-		return teacherList;
-		
-	}
-
 	/**
 	 * Return the list of the current week
 	 */
@@ -392,6 +300,66 @@ public class BookingServiceImpl extends AServiceImpl implements BookingService {
 		repeat.setEventDateStart((Date)(rs.getTimestamp("rep.event_date_start")));
 		repeatList.add(repeat);
 		return repeatList;
+		
+	}
+
+	@Override
+	public List<String> getDifferentTeacherIdByIdGroupAndTipEvent(Long idGroup, List<TipEvent> tipEventList)
+			throws Exception {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("BookingServiceImpl - getDifferentTeacherIdByIdGroup(idGroup: " + idGroup + ", tipEventList: " + tipEventList + ")");
+		
+		List<String> teacherList = new ArrayList<String>();
+		
+		Connection con = null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			StringBuilder query = new StringBuilder();
+			query.append("select distinct(teacher_id) from bookings b, resources res where b.resource_id = res.id and res.group_id = ? and b.tip_event_id in (");
+			for (int i = 0; i < tipEventList.size(); i++) {
+				query.append("?");
+				if(i != tipEventList.size() - 1)
+					query.append(",");
+			}
+			query.append(")");
+			st = con.prepareStatement(query.toString());
+			
+			st.setLong(1, idGroup);
+			int index = 2;
+			for (int j = 0; j < tipEventList.size(); j++) {
+				st.setShort(index++, tipEventList.get(j).getId());
+			}
+			rs = st.executeQuery();
+			while (rs.next()) {
+				
+				teacherList.add((String) rs.getString("teacher_id"));
+				
+			}
+		} catch (SQLException e) {
+			logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
+		} finally {
+			if (st != null) {
+				try {
+					st.close();
+				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
+				}
+			}
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					logger.error("BookingServiceImpl - getDifferentTeacherIdByIdGroup() - " + e.getMessage());
+				}
+			}
+
+		}
+		
+		return teacherList;
 		
 	}
 

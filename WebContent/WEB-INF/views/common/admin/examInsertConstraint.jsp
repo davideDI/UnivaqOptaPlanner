@@ -70,7 +70,7 @@
 		<div class="col-md-12">
 			
      		<button class="btn" name="optimizationExamSubmit" value="${idResource}" id="optSubmit" >
-     			<spring:message code=".calendar.optimize.course" />
+     			<spring:message code=".calendar.optimize.exam" />
      		</button>
 		
 		</div>

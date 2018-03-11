@@ -9,8 +9,7 @@ public interface BookingService {
 
 	List<Booking> getAllBookings() throws Exception; 
 	List<String> getDifferentTeacherId() throws Exception;
-	List<String> getDifferentTeacherIdByIdResource(Long idResource) throws Exception;
-	List<String> getDifferentTeacherIdByIdGroup(Long idGroup) throws Exception;
+	List<String> getDifferentTeacherIdByIdGroupAndTipEvent(Long idGroup, List<TipEvent> tipEventList) throws Exception;
 	List<Booking> getAllBookingsByIdResource(Long idResource) throws Exception; 
 	List<Booking> getAllBookingsByIdGroup(Long idGroup, List<TipEvent> tipEventList) throws Exception; 
 	

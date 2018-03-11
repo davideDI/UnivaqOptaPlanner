@@ -20,15 +20,15 @@
         
         <br>
         
-		<div class="row">
-             <div class="col-md-12">
-
-                 <c:forEach items="${resourceList}" var="resourceTemp">
-                 	<p><c:out value="${resourceTemp.name}" /></p><p id="${resourceTemp.id}">&nbsp;&nbsp;</p>
-		    	</c:forEach>
-
-             </div>
-        </div>
+        <c:forEach items="${resourceList}" var="resourceTemp">
+			<div class="row">
+				<div class="col-md-2"></div>
+	            <div class="col-md-8 circle" id="${resourceTemp.id}">
+	               	<p><c:out value="${resourceTemp.name}" /></p>
+	            </div>
+	            <div class="col-md-2"></div>
+	        </div>
+        </c:forEach>
 	</div>
 	
     <!-- Div principale -->

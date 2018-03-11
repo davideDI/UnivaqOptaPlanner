@@ -107,9 +107,9 @@ public abstract class Exam extends AbstractPersistable {
         return Long.toString(topic.getId());
     }
 
-    @Override
-    public String toString() {
-        return topic.toString();
-    }
+	@Override
+	public String toString() {
+		return "Exam [topic=" + topic + ", room=" + room + "]";
+	}
 
 }

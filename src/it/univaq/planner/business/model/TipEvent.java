@@ -1,5 +1,8 @@
 package it.univaq.planner.business.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum TipEvent {
 
 	Esame     ((short)1, "Esame",     "Evento di tipo Esame"),
@@ -27,6 +30,24 @@ public enum TipEvent {
 
 	public String getDescrizione() {
 		return descrizione;
+	}
+	
+	public static List<TipEvent> getCourseTipEvent() {
+		
+		List<TipEvent> tipEventList = new ArrayList<TipEvent>();
+		tipEventList.add(TipEvent.Lezione);
+		tipEventList.add(TipEvent.Seminario);
+		tipEventList.add(TipEvent.Generico);
+		return tipEventList;
+		
+	}
+	
+	public static List<TipEvent> getExaminationTipEvent() {
+		
+		List<TipEvent> tipEventList = new ArrayList<TipEvent>();
+		tipEventList.add(TipEvent.Esame);
+		return tipEventList;
+		
 	}
 	
 }

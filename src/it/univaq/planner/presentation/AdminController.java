@@ -7,7 +7,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,8 +30,11 @@ import org.optaplanner.examples.curriculumcourse.domain.Timeslot;
 import org.optaplanner.examples.curriculumcourse.domain.UnavailablePeriodPenalty;
 import org.optaplanner.examples.examination.domain.Exam;
 import org.optaplanner.examples.examination.domain.Examination;
+import org.optaplanner.examples.examination.domain.FollowingExam;
+import org.optaplanner.examples.examination.domain.LeadingExam;
 import org.optaplanner.examples.examination.domain.PeriodPenalty;
 import org.optaplanner.examples.examination.domain.RoomPenalty;
+import org.optaplanner.examples.examination.domain.RoomPenaltyType;
 import org.optaplanner.examples.examination.domain.Student;
 import org.optaplanner.examples.examination.domain.Topic;
 import org.springframework.stereotype.Controller;
@@ -72,7 +78,7 @@ public class AdminController extends ABaseController {
 			}
 			mav.addObject(ID_RESOURCE, resourceIdL);
 			
-			List<String> teacherList = bookingService.getDifferentTeacherIdByIdGroup(resourceService.getResourceById(resourceIdL).getGroup().getId());
+			List<String> teacherList = bookingService.getDifferentTeacherIdByIdGroupAndTipEvent(resourceService.getResourceById(resourceIdL).getGroup().getId(), TipEvent.getCourseTipEvent());
 			mav.addObject(TEACHER_LIST, teacherList);
 			
 			mav.addObject(TIMESLOT_LIST, TIMES);
@@ -315,13 +321,9 @@ public class AdminController extends ABaseController {
 		List<Group> groupList = new ArrayList<Group>();
 		groupList.add(resource.getGroup());
 		
-		List<String> teacherList = bookingService.getDifferentTeacherIdByIdGroup(resource.getGroup().getId());
+		List<String> teacherList = bookingService.getDifferentTeacherIdByIdGroupAndTipEvent(resource.getGroup().getId(), TipEvent.getCourseTipEvent());
 		
-		List<TipEvent> tipEventList = new ArrayList<TipEvent>();
-		tipEventList.add(TipEvent.Lezione);
-		tipEventList.add(TipEvent.Seminario);
-		tipEventList.add(TipEvent.Generico);
-		List<Booking> bookingList = bookingService.getAllBookingsByIdGroup(resource.getGroup().getId(), tipEventList);
+		List<Booking> bookingList = bookingService.getAllBookingsByIdGroup(resource.getGroup().getId(), TipEvent.getCourseTipEvent());
 				
 		//CurriculumList
 		courseScheduleInput.setCurriculumList(getCurriculumList(bookingList));
@@ -471,7 +473,8 @@ public class AdminController extends ABaseController {
 		
 	}
 	
-	private int getRepeatDuration(Repeat repeat) {
+	@SuppressWarnings("unused")
+	private int getRepeatDurationHours(Repeat repeat) {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("AdminController - getRepeatDuration(repeat: " + repeat + ")");
@@ -489,6 +492,20 @@ public class AdminController extends ABaseController {
 			diffHours++;
 		
 		return (int) diffHours;
+		
+	}
+	
+	private int getRepeatDurationMinutes(Repeat repeat) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getRepeatDuration(repeat: " + repeat + ")");
+		
+		long diff = repeat.getEventDateEnd().getTime() - repeat.getEventDateStart().getTime();
+
+		long diffSeconds = diff / 1000;  
+		long diffMinutes = diffSeconds / 60;     
+		
+		return (int) diffMinutes;
 		
 	}
 	
@@ -705,7 +722,7 @@ public class AdminController extends ABaseController {
 			}
 			mav.addObject(ID_RESOURCE, resourceIdL);
 			
-			List<String> teacherList = bookingService.getDifferentTeacherIdByIdResource(resourceIdL);
+			List<String> teacherList = bookingService.getDifferentTeacherIdByIdGroupAndTipEvent(resourceService.getResourceById(resourceIdL).getGroup().getId(), TipEvent.getExaminationTipEvent());
 			mav.addObject(TEACHER_LIST, teacherList);
 			
 			mav.addObject(TIMESLOT_LIST, TIMES);
@@ -740,7 +757,7 @@ public class AdminController extends ABaseController {
 				resourceIdL = new Long(resourceId);
 			}
 			
-			Examination examination = getExamination(resourceIdL);
+			Examination examination = getExamination(resourceIdL, request);
 			SolverFactory<Examination> solverFactory = SolverFactory.createFromXmlResource(PATH_EXAM_SOLVER_CONFIG);
 	        SolverConfig solverConfig = solverFactory.getSolverConfig();
 	        
@@ -759,6 +776,15 @@ public class AdminController extends ABaseController {
 			solver.solve(examination);
 			
 			Examination bestSolution = (Examination) solver.getBestSolution();
+			System.out.println(bestSolution);
+			
+			Resource resource = resourceService.getResourceById(resourceIdL);
+	        List<Resource> resourceList = resourceService.getResourcesByIdGroup(resource.getGroup().getId());
+	        mav.addObject(RESOURCE_LIST, resourceList);
+			mav.addObject(SELECTED_GROUP, resource.getGroup());
+			mav.addObject(FIRST_RESOURCE, resource);
+			List<Booking> bookingListFromBestSolution = getBookingsFromExamination(bestSolution);
+			mav.addObject(BOOKING_LIST, bookingListFromBestSolution);
 			
 		} catch(Exception ex) {
 			manageGenericError(mav, ex);
@@ -771,16 +797,24 @@ public class AdminController extends ABaseController {
 		return mav;
 		
 	}
+	
+	private List<Booking> getBookingsFromExamination(Examination bestSolution) {
+		
+		List<Booking> bookingList = new ArrayList<Booking>();
+		
+		
+		return bookingList;
+		
+	}
 
-	private Examination getExamination(Long resourceId) throws Exception {
+	private Examination getExamination(Long resourceId, HttpServletRequest request) throws Exception {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("AdminController - getExamination(resourceId: " + resourceId + ")");
 		
-		/*
-			private InstitutionParametrization institutionParametrization;
-		 */
 		Examination examination = new Examination();
+		
+		Map<Topic, Set<Topic>> coincidenceMap = new HashMap<Topic, Set<Topic>>();
 		
 		Resource resource = resourceService.getResourceById(resourceId);
 		
@@ -798,61 +832,150 @@ public class AdminController extends ABaseController {
 		examination.setPeriodList(getPeriodListExamination(bookingList));
 		
 		//topicList
-		//examination.setTopicList(getTopicList(bookingList), examination);
+		examination.setTopicList(getTopicList(bookingList, examination, coincidenceMap));
 		
 		//periodPenaltyList
-		examination.setPeriodPenaltyList(getPeriodPenaltyList());
+		examination.setPeriodPenaltyList(getPeriodPenaltyList(request, bookingList));
 		
 		//roomPenaltyList
-		examination.setRoomPenaltyList(getRoomPenaltyList());
+		examination.setRoomPenaltyList(getRoomPenaltyList(examination.getTopicList()));
 		
 		//examList
-	    examination.setExamList(getExamList());
+	    examination.setExamList(getExamList(examination, bookingList, coincidenceMap));
 		
 		return examination;
 		
 	}
 	
-	private List<Exam> getExamList() {
+	private List<Exam> getExamList(Examination examination, List<Booking> bookingList, Map<Topic, Set<Topic>> coincidenceMap) {
 		
 		if(logger.isDebugEnabled())
-			logger.debug("AdminController - getExamList()");
+			logger.debug("AdminController - getExamList(examination: " + examination + ", " + bookingList + ", coincidenceMap: " + coincidenceMap + ")");
 		
-		List<Exam> examList = new ArrayList<Exam>();
-		
-		//TODO
+		List<Topic> topicList = examination.getTopicList();
+        List<Exam> examList = new ArrayList<>(topicList.size());
+        Map<Topic, LeadingExam> leadingTopicToExamMap = new HashMap<>(topicList.size());
+        for (Topic topic : topicList) {
+        	Exam exam;
+            Topic leadingTopic = topic;
+        	for (Topic coincidenceTopic : coincidenceMap.get(topic)) {
+                if (coincidenceTopic.getId() < leadingTopic.getId()) {
+                    leadingTopic = coincidenceTopic;
+                }
+            }
+            if (leadingTopic == topic) {
+                LeadingExam leadingExam = new LeadingExam();
+                leadingExam.setFollowingExamList(new ArrayList<FollowingExam>(10));
+                leadingTopicToExamMap.put(topic, leadingExam);
+                exam = leadingExam;
+            } else {
+                FollowingExam followingExam = new FollowingExam();
+                LeadingExam leadingExam = leadingTopicToExamMap.get(leadingTopic);
+                if (leadingExam == null) {
+                    throw new IllegalStateException("The followingExam (" + topic.getId()
+                            + ")'s leadingExam (" + leadingExam + ") cannot be null.");
+                }
+                followingExam.setLeadingExam(leadingExam);
+                leadingExam.getFollowingExamList().add(followingExam);
+                exam = followingExam;
+            }
+            exam.setId(topic.getId());
+            exam.setTopic(topic);
+            // Notice that we leave the PlanningVariable properties on null
+            examList.add(exam);
+        	
+        	
+        	
+//            Exam exam;
+//            LeadingExam leadingExam = new LeadingExam();
+//            leadingExam.setFollowingExamList(new ArrayList<FollowingExam>(10));
+//            exam = leadingExam;
+//            exam.setId(topic.getId());
+//            exam.setTopic(topic);
+//            // Notice that we leave the PlanningVariable properties on null
+//            examList.add(exam);
+        }
+        examination.setExamList(examList);
 		
 		return examList;
 		
 	}
 	
-	private List<RoomPenalty> getRoomPenaltyList() {
+	private List<RoomPenalty> getRoomPenaltyList(List<Topic> topicList) {
 		
 		if(logger.isDebugEnabled())
-			logger.debug("AdminController - getRoomPenaltyList()");
+			logger.debug("AdminController - getRoomPenaltyList(topicList: " + topicList + ")");
 		
 		List<RoomPenalty> roomPenaltyList = new ArrayList<RoomPenalty>();
-		
-		//TODO
+//		long id = 0;
+//		if(topicList != null) {
+//			for (Topic topic : topicList) {
+//				RoomPenalty roomPenalty = new RoomPenalty();
+//				roomPenalty.setId(id++);
+//				roomPenalty.setTopic(topic);
+//				roomPenalty.setRoomPenaltyType(RoomPenaltyType.ROOM_EXCLUSIVE);
+//				roomPenaltyList.add(roomPenalty);
+//			}
+//		}
 		
 		return roomPenaltyList;
 		
 	}
 
-	private List<PeriodPenalty> getPeriodPenaltyList() {
+	private List<PeriodPenalty> getPeriodPenaltyList(HttpServletRequest request, List<Booking> bookingList) {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("AdminController - getPeriodPenaltyList()");
 		
 		List<PeriodPenalty> periodPenalityList = new ArrayList<PeriodPenalty>();
 		
-		//TODO
+//		long penaltyId = 0L;
+//
+//		List<String> teacherList = getTeacherListExamination(bookingList);
+//        for (String teacherTemp : teacherList) {
+//			if(!teacherTemp.equalsIgnoreCase(N_D)) {
+//				String [] periodList = request.getParameterValues(teacherTemp);
+//				String [] dayList = request.getParameterValues(teacherTemp + _DAY);
+//				
+//				PeriodPenalty periodPenalityTemp = new PeriodPenalty();
+//				periodPenalityTemp.setId(penaltyId++);
+//				periodPenalityList.add(periodPenalityTemp);
+//				
+//			}
+//		}
 		
 		return periodPenalityList;
 		
 	}
 	
-	private List<Topic> getTopicList(List<Booking> bookingList, Examination examination) {
+	private List<String> getTeacherListExamination(List<Booking> bookingList) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("AdminController - getTeacherListExamination(bookingList: " + bookingList + ")");
+		
+		List<String> teacherListString = new ArrayList<String>();
+		if(bookingList != null && !bookingList.isEmpty()) {
+			for (Booking booking : bookingList) {
+				if(teacherListString.isEmpty()) {
+					teacherListString.add(booking.getTeacherID());
+				} else {
+					boolean contains = false;
+					for (String teacherTemp : teacherListString) {
+						if(teacherTemp.equalsIgnoreCase(booking.getTeacherID())) {
+							contains = true;
+							break;
+						}
+					}
+					if(!contains)
+						teacherListString.add(booking.getTeacherID());
+				}
+			}
+		}
+		
+		return teacherListString;
+	}
+	
+	private List<Topic> getTopicList(List<Booking> bookingList, Examination examination, Map<Topic, Set<Topic>> coincidenceMap) {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("AdminController - getTopicList(bookingList: " + bookingList + ", examination:" + examination + ")");
@@ -866,9 +989,11 @@ public class AdminController extends ABaseController {
 				for (Repeat repeat : booking.getRepeatList()) {
 					Topic topicTemp = new Topic();
 					topicTemp.setId(i++);
-					topicTemp.setDuration(getRepeatDuration(repeat));
-					//topicTemp.setStudentiList(qui)
+					topicTemp.setDuration(getRepeatDurationMinutes(repeat));
+					//All the topics have the same students
+					topicTemp.setStudentList(examination.getStudentList());
 					topicList.add(topicTemp);
+					coincidenceMap.put(topicTemp, new HashSet<Topic>());
 				}
 				
 			}
@@ -885,7 +1010,16 @@ public class AdminController extends ABaseController {
 		
 		List<org.optaplanner.examples.examination.domain.Period> periodList = new ArrayList<org.optaplanner.examples.examination.domain.Period>();
 		
-		//TODO
+		if(bookingList != null) {
+			for (Booking booking : bookingList) {
+				for (Repeat repeat : booking.getRepeatList()) {
+					org.optaplanner.examples.examination.domain.Period periodTemp = new org.optaplanner.examples.examination.domain.Period();
+					periodTemp.setId(repeat.getId());
+					periodTemp.setDuration(getRepeatDurationMinutes(repeat));
+					periodList.add(periodTemp);
+				}
+			}
+		}
 		
 		return periodList;
 		
@@ -914,10 +1048,10 @@ public class AdminController extends ABaseController {
 		
 	}
 	
-	private int randomWithRange(int min, int max) {
-	   int range = (max - min) + 1;     
-	   return (int)(Math.random() * range) + min;
-	}
+//	private int randomWithRange(int min, int max) {
+//	   int range = (max - min) + 1;     
+//	   return (int)(Math.random() * range) + min;
+//	}
 
 	private List<org.optaplanner.examples.examination.domain.Room> getRoomListExamination(List<Resource> resourceList) {
 		
