@@ -66,7 +66,7 @@
           header: {
               left: 'prev,next today',
               center: 'title',
-              right: 'month,basicWeek,basicDay,listDay,agendaWeek'
+              right: 'month,agendaWeek,basicDay,listDay'
                   },
           minTime: "08:00:00", //Definizione orari min
           maxTime: "20:30:00", //Definizione orari max
@@ -78,7 +78,9 @@
           eventDurationEditable: false,  //disabilitato il resize dell'evento
           defaultView: 'agendaWeek', //Vista di default
           eventLimit: true, // Quando ci sono più eventi per una data compare il link view more
-
+          allDaySlot: false,
+          contentHeight: 'auto',
+          
           //Caricamento eventi
           events: [
         	  

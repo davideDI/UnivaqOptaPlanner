@@ -1,19 +1,15 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
-<footer id="footer">	
-	<div class="footer2">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-4 panel"></div>
-				<div class="col-md-4 panel">
-					<div class="panel-body">
-						<p class="text-center">
-							<spring:message code=".common.title" />
-						</p>
-					</div>
-				</div>
-				<div class="col-md-4 panel"></div>
+<footer class="footer2" style=" clear: both; width: 100%; padding: 10px 0px; height: 70px">	
+	<div class="container-fluid text-center text-md-left">
+        <div class="row">
+          <div class="col-md-2"></div>
+           <div class="col-md-8">
+				<p class="text-center" style="font-size: 16px">
+					<spring:message code=".common.title" />
+				</p>
 			</div>
+			<div class="col-md-2"></div>
 		</div>
 	</div>
 </footer>

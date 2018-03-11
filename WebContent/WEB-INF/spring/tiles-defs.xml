@@ -7,6 +7,8 @@
 
 	<definition name="standard" template="/WEB-INF/views/layout/layout.jsp">
 		<put-attribute name="menu" value="/WEB-INF/views/layout/menu.jsp" />
+		<put-attribute name="divGif" value="/WEB-INF/views/layout/divGif.jsp" />
+		<put-attribute name="divMessagesError" value="/WEB-INF/views/layout/divMessagesError.jsp" />
 		<put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp" />
 	</definition>
 

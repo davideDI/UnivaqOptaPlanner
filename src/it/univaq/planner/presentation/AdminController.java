@@ -242,7 +242,10 @@ public class AdminController extends ABaseController {
 		
 		Calendar cal = GregorianCalendar.getInstance();
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
-		cal.add(Calendar.DATE, period.getDay().getDayIndex() + 1);
+		
+		cal.add(Calendar.DATE, period.getDay().getDayIndex());
+		if(cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+			cal.add(Calendar.DATE, 1);
 		
 		String hourStart = TIMES[period.getTimeslot().getTimeslotIndex()].substring(0,2);
 		String minuteStart = TIMES[period.getTimeslot().getTimeslotIndex()].substring(3,5);
