@@ -8,9 +8,13 @@ Licence: Creative Commons Attribution 3.0** - http://creativecommons.org/license
 */
 @import url(http://fonts.googleapis.com/css?family=Oswald:400,700);
 @import url(http://fonts.googleapis.com/css?family=Lato:400,700);
+html{
+	height: 100%;
+}
 body {
 	font-family: 'Lato', sans-serif;
 	font-weight: normal;
+	height: 100%;
 }
 /*General*/
 h1, h2, h3, h4, h5, h6 {
@@ -280,14 +284,14 @@ ul.list-spaces li {
 .top-margin {
 	margin-top: 20px;
 }
-.circle {
+/* .circle {
 	background: rgb(214, 214, 214);
 	width: 95px;
 	height: 95px;
 	border-radius: 90px;
 	line-height: 95px;
 	margin: 0 auto 20px;
-}
+} */
 img {
 	max-width: 100%;
 }
@@ -349,7 +353,6 @@ img.pull-left {
 footer {
 	border-top: 1px solid #e5e5e5;
 	background: #ECECEC;
-	margin-top:40px;
 }
 .social {
 	margin: 20px 0;
@@ -828,10 +831,10 @@ font-size:13px;
 }
 
 .circle {
-    border-radius: 200px;
-    height: 200px;
+    border-radius: 50px;
+    height: 50px;
     font-weight: bold;
-    width: 200px;
+    width: 50px;
     display: table;
     margin: 20px auto;
 }
@@ -839,4 +842,9 @@ font-size:13px;
 .circle p {
     vertical-align: middle;
     display: table-cell;
+}
+
+.btn:hover, .btn:focus, .btn:active {
+	text-decoration: none;
+	color: #FFF;
 }

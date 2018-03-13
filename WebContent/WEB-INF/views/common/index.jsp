@@ -42,6 +42,9 @@
 		            <p class="text-center"><b><spring:message code=".index.authorized" /></b></p>
 		        </div>
 		    </div>
+		    
+		    <br><br>
+		    
 			<div class="row">
 				<c:forEach items="${sessionScope.groupList}"  var="group">
 					<div class="col-xs-4 col-sm-4 col-md-4">

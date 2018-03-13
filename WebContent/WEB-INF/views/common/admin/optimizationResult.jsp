@@ -24,7 +24,10 @@
 			<div class="row">
 				<div class="col-md-2"></div>
 	            <div class="col-md-8" >
-	               	<p class="circle" id="${resourceTemp.id}"><c:out value="${resourceTemp.name}" /></p><p><c:out value="${resourceTemp.name}" /></p>
+	            	<div class="row">
+	            		<div class="col-md-6" ><p><c:out value="${resourceTemp.name}" /></p></div>
+						<div class="col-md-6"><p class="circle" id="${resourceTemp.id}"></p></div>
+		            </div>
 	            </div>
 	            <div class="col-md-2"></div>
 	        </div>

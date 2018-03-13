@@ -55,16 +55,16 @@
              <div class="col-md-12">
              	<legend><spring:message code=".calendar.tip.events" /></legend>	
              	<p><c:out value="<%= TipEvent.Esame.getName() %>" />&nbsp;&nbsp;
-                	<img width="17" height="17" class="img-circle" src="${pageContext.request.contextPath}/resources/images/palla_verde.jpg" />
+                	<img width="30" class="img-circle" src="${pageContext.request.contextPath}/resources/images/esame.png" />
                 </p>
                 <p><c:out value="<%= TipEvent.Lezione.getName() %>" />&nbsp;&nbsp;
-                	<img width="17" height="17" class="img-circle" src="${pageContext.request.contextPath}/resources/images/palla_rossa.jpg" />
+                	<img width="30" class="img-circle" src="${pageContext.request.contextPath}/resources/images/lezione.png" />
                 </p>
                 <p><c:out value="<%= TipEvent.Seminario.getName() %>" />&nbsp;&nbsp;
-                    <img width="17" height="17" class="img-circle" src="${pageContext.request.contextPath}/resources/images/palla_gialla.jpg" />
+                    <img width="30" class="img-circle" src="${pageContext.request.contextPath}/resources/images/seminario.png" />
                 </p>
              	<p><c:out value="<%= TipEvent.Generico.getName() %>" />&nbsp;&nbsp;
-                    <img width="17" height="17" class="img-circle" src="${pageContext.request.contextPath}/resources/images/palla_blu.jpg" />
+                    <img width="30" class="img-circle" src="${pageContext.request.contextPath}/resources/images/generico.png" />
                 </p>
              </div>
         </div>
@@ -129,16 +129,16 @@
 	                        end        	: moment('${repeat.eventDateEnd}').format("YYYY-MM-DD HH:mm:ss"),
 	                        <c:choose>
 	                        	<c:when test="${booking.idTipEvent eq 1}">
-	                        		color : '#00FF00'
+	                        		color : '#6ac259'
 	                        	</c:when>
 	                        	<c:when test="${booking.idTipEvent eq 2}">
-	                        		color : '#FF0000'
+	                        		color : '#e21b1b'
 	                        	</c:when>
 	                        	<c:when test="${booking.idTipEvent eq 3}">
-	                        		color : '#FFFF00'
+	                        		color : '#dbba05'
 	                        	</c:when>
 	                        	<c:otherwise>
-	                        		color : '#0000FF'
+	                        		color : '#4a73c5'
 	                        	</c:otherwise>
 	                        </c:choose>
         	  			},
