@@ -32,6 +32,17 @@
 	            <div class="col-md-2"></div>
 	        </div>
         </c:forEach>
+        
+        <br>
+        
+        <div class="row">
+			<div class="col-md-2"></div>
+            <div class="col-md-8" >
+				<span><b>${resultScore}</b></span>
+			</div>
+			<div class="col-md-2"></div>
+		</div>
+        
 	</div>
 	
     <!-- Div principale -->

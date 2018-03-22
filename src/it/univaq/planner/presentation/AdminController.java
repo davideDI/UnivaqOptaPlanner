@@ -34,7 +34,6 @@ import org.optaplanner.examples.examination.domain.FollowingExam;
 import org.optaplanner.examples.examination.domain.LeadingExam;
 import org.optaplanner.examples.examination.domain.PeriodPenalty;
 import org.optaplanner.examples.examination.domain.RoomPenalty;
-import org.optaplanner.examples.examination.domain.RoomPenaltyType;
 import org.optaplanner.examples.examination.domain.Student;
 import org.optaplanner.examples.examination.domain.Topic;
 import org.springframework.stereotype.Controller;
@@ -131,7 +130,7 @@ public class AdminController extends ABaseController {
 	        String secondLimit = (String) request.getParameter(PARAMETER_SECOND_LIMIT);
 	        if(secondLimit != null && !secondLimit.isEmpty()) {
 	        	solverConfig.getTerminationConfig().setMinutesSpentLimit(null);
-		        solverConfig.getTerminationConfig().setSecondsSpentLimit(Long.getLong(secondLimit));
+		        solverConfig.getTerminationConfig().setSecondsSpentLimit(new Long(secondLimit));
 	        } else {
 	        	solverConfig.getTerminationConfig().setMinutesSpentLimit(null);
 		        solverConfig.getTerminationConfig().setSecondsSpentLimit(15L);
@@ -141,6 +140,7 @@ public class AdminController extends ABaseController {
 			Solver<CourseSchedule> solver = solverConfig.buildSolver(solverContext);
 	        solver.solve(courseSchedule);
 	        CourseSchedule bestSolution = (CourseSchedule) solver.getBestSolution();
+	        mav.addObject(RESULT_SCORE, bestSolution.getScore().getHardScore() + "hard/" + bestSolution.getScore().getSoftScore() + "soft");
 	        Resource resource = resourceService.getResourceById(resourceIdL);
 	        List<Resource> resourceList = resourceService.getResourcesByIdGroup(resource.getGroup().getId());
 	        mav.addObject(RESOURCE_LIST, resourceList);
@@ -217,7 +217,7 @@ public class AdminController extends ABaseController {
 					booking.setSubjectID(lectureTemp.getCourse().getCode());
 					booking.setTeacherID(lectureTemp.getCourse().getTeacher().getCode());
 					booking.setCdsID(lectureTemp.getCourse().getCurriculumList().get(0).getCode());
-					booking.setName(booking.getSubjectID() + booking.getTeacherID() + booking.getCdsID());
+					booking.setName(booking.getSubjectID() + " - " + booking.getTeacherID());
 					Repeat repeat = new Repeat();
 					repeat.setIdBooking(lectureTemp.getCourse().getId());
 					repeat.setId(lectureTemp.getId());

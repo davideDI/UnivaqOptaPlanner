@@ -47,6 +47,7 @@ public interface PlannerConstants {
 	public final static String TEACHER_LIST = "teacherList";
 	public final static String TIMESLOT_LIST = "timeslotList";
 	public final static String DAY_WEEK_LIST = "dayWeekList";
+	public final static String RESULT_SCORE = "resultScore";
 	
 	//Utility
 	public final static String N_D = "N.D.";
